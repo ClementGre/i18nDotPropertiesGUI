@@ -1,0 +1,115 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.beryx.jlink' version '2.22.3'
+}
+repositories{
+    mavenCentral()
+    jcenter()
+}
+dependencies{
+
+    // JAVA FX //
+    compile (group: 'org.jfxtras', name: 'jmetro', version: '11.6.14'){
+        exclude group: 'org.openjfx'
+    }
+
+}
+javafx {
+    version = '15'
+    modules = ['javafx.controls', 'javafx.swing', 'javafx.fxml']
+}
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+mainClassName = "fr.clementgre.i18nTranslationManager.Main"
+
+version = "1.0"
+description = ""
+
+task packageMsi(type: Exec){
+    workingDir project.projectDir
+    commandLine = ["gradlew.bat", "jpackage", "-PinstallerType=msi"]
+}
+task packageDmg(type: Exec){
+    workingDir project.projectDir
+    commandLine = ["./gradlew", "jpackage", "-PinstallerType=dmg"]
+}
+task packageDeb(type: Exec){
+    workingDir project.projectDir
+    commandLine = ["./gradlew", "jpackage", "-PinstallerType=deb"]
+}
+task packageRpm(type: Exec){
+    workingDir project.projectDir
+    commandLine = ["./gradlew", "jpackage", "-PinstallerType=rpm"]
+}
+sourceCompatibility = 15
+targetCompatibility = 15
+
+jlink {
+    options = [
+                '--strip-debug',
+                '--compress', '2',
+                '--no-header-files',
+                '--no-man-pages',
+            ] as List<String>
+    launcher {
+        name = 'i18nTranslationManager'
+    }
+
+    if(Os.isFamily(Os.FAMILY_WINDOWS)){
+        //targetPlatform('win', 'C:\\Program Files\\Java\\Libertica-15')
+        targetPlatform('win', 'C:\\Program Files\\AdoptOpenJDK\\jdk-15.0.1.7-hotspot')
+    }else if(Os.isFamily(Os.FAMILY_MAC)){
+        targetPlatform('mac', '/Users/vincent/Library/Java/JavaVirtualMachines/openjdk-15.0.1/Contents/Home')
+    }else if(Os.isFamily(Os.FAMILY_UNIX)){
+        targetPlatform('lin', '/home/clement/bin/AdoptOpenJDK-15/')
+    }
+
+    jpackage {
+
+        installerType = project.findProperty('installerType') // we will pass this from the command line (example: -PinstallerType=msi)
+
+        installerOptions = [
+                '--description', project.description,
+                //'--copyright', 'Copyrigth 2019 Clément Grennerat',
+                '--app-version', project.version,
+                '--vendor', "Clément Grennerat",
+                '--type', installerType
+        ] as List<String>
+
+
+
+        if(installerType == 'msi'){ // WINDOWS
+            imageOptions += ['--icon', 'src/main/resources/logo.ico']
+            installerOptions += [
+                    '--win-dir-chooser',
+                    '--win-menu',
+                    '--win-shortcut',
+                    '--win-menu-group'
+            ]
+        }else if(installerType == 'dmg'){ // MAC
+            imageOptions += ['--icon', 'src/main/resources/logo.icns']
+            installerOptions += [
+                    "--mac-package-name", "i18nTranslationManager",
+                    '--icon', 'src/main/resources/logo.icns'
+            ]
+        }else if(installerType in ['deb', 'rpm']){ // LINUX
+            imageOptions += ['--icon', 'src/main/resources/logo.png']
+            installerOptions += [
+                    '--linux-menu-group', 'Education;Office',
+                    '--linux-shortcut',
+                    '--icon', 'src/main/resources/logo.png'
+            ]
+            if(installerType == 'deb'){
+                installerOptions += ['--linux-deb-maintainer', 'clement.grennerat@free.fr']
+            }else if(installerType == 'rpm'){
+                installerOptions += ['--linux-rpm-license-type', 'Apache-2.0']
+            }
+        }
+    }
+}
+
+

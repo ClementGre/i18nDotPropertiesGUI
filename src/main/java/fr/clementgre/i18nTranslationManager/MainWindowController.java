@@ -40,6 +40,15 @@ public class MainWindowController extends Stage {
 
     public TranslationsListView translations;
 
+    // bottom bar
+
+    public ComboBox sortMode;
+    public CheckBox smallMode;
+
+    public Label targetStatus;
+    public Label sourceStatus;
+    public Label alternativeStatus;
+
     @FXML
     public void initialize(){
 
@@ -50,9 +59,9 @@ public class MainWindowController extends Stage {
 
 
         Platform.runLater(() -> {
-            sourceTranslation = new FilePanel(sourceTranslationText, sourceTranslationField, sourceTranslationBrowse, FilePanel.TranslationFileType.SOURCE, this);
-            alternativeTranslation = new FilePanel(alternativeTranslationText, alternativeTranslationField, alternativeTranslationBrowse, FilePanel.TranslationFileType.ALTERNATIVE, this);
-            targetTranslation = new FilePanel(targetTranslationText, targetTranslationField, targetTranslationBrowse, FilePanel.TranslationFileType.TARGET, this);
+            sourceTranslation = new FilePanel(sourceTranslationText, sourceTranslationField, sourceTranslationBrowse, sourceStatus, FilePanel.TranslationFileType.SOURCE, this);
+            alternativeTranslation = new FilePanel(alternativeTranslationText, alternativeTranslationField, alternativeTranslationBrowse, alternativeStatus, FilePanel.TranslationFileType.ALTERNATIVE, this);
+            targetTranslation = new FilePanel(targetTranslationText, targetTranslationField, targetTranslationBrowse, targetStatus, FilePanel.TranslationFileType.TARGET, this);
 
             translations = new TranslationsListView(this);
 

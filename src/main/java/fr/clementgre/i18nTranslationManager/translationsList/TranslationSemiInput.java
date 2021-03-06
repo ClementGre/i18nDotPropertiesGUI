@@ -10,14 +10,14 @@ import javafx.scene.layout.Region;
 
 public class TranslationSemiInput extends Region {
 
-    private final Label label = new Label();
-    private FitTextArea textArea;
+    public final Label label = new Label();
+    public FitTextArea textArea;
 
     private boolean hasText = false;
 
-    private String labelStyle = "";
-    private String fieldStyle = "";
-    private int fieldDefaultHeight = 25;
+    public String labelStyle = "";
+    public String fieldStyle = "";
+    public int fieldDefaultHeight = 25;
 
     private final TranslationCell cell;
     private final TranslationCell.TextType type;
@@ -34,13 +34,11 @@ public class TranslationSemiInput extends Region {
         if(type == TranslationCell.TextType.KEY){
             label.layoutXProperty().bind(cell.pane.widthProperty().subtract(label.widthProperty()).divide(2));
             labelStyle = "-fx-text-fill: #1b9dc9;";
-
-            if(!cell.listView.compactMode) label.setPadding(new Insets(5, 8, 5, 8));
         }else if(type == TranslationCell.TextType.COMMENT){
             labelStyle = "-fx-text-fill: #767676;";
             label.setPadding(new Insets(3, 8, 5, 8));
 
-        }else if(type == TranslationCell.TextType.SOURCE && !cell.listView.compactMode){
+        }else if(type == TranslationCell.TextType.SOURCE){
             labelStyle = "-fx-font-size: 14;";
             fieldStyle = "-fx-font-size: 14;";
             fieldDefaultHeight = 30;
@@ -94,7 +92,8 @@ public class TranslationSemiInput extends Region {
     }
 
     private void publishEdit(){
-        cell.publishEditAuto(type, label.getText());
+        if(hasText) cell.publishEditAuto(type, label.getText());
+        else cell.publishEditAuto(type, "");
     }
 
     public String getText(){

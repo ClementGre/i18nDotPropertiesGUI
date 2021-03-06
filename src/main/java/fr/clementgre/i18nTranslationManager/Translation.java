@@ -1,14 +1,15 @@
 package fr.clementgre.i18nTranslationManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Translation implements Comparable<Translation>{
 
-    private ArrayList<String> comments = new ArrayList<>();
+    private List<String> comments = new ArrayList<>();
     private String key;
     private String value;
 
-    public Translation(ArrayList<String> comments, String key, String value) {
+    public Translation(List<String> comments, String key, String value) {
         this.comments = comments;
         this.key = key;
         this.value = value;
@@ -18,11 +19,12 @@ public class Translation implements Comparable<Translation>{
 
     }
 
-    public ArrayList<String> getComments() {
+    public List<String> getComments() {
+        if(comments == null) return new ArrayList<>();
         return comments;
     }
 
-    public void setComments(ArrayList<String> comments) {
+    public void setComments(List<String> comments) {
         this.comments = comments;
     }
 

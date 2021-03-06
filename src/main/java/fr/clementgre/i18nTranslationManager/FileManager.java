@@ -2,11 +2,15 @@ package fr.clementgre.i18nTranslationManager;
 
 import fr.clementgre.i18nTranslationManager.utils.DialogBuilder;
 import fr.clementgre.i18nTranslationManager.utils.StringUtils;
+import javafx.application.Platform;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class FileManager {
 
@@ -69,7 +73,7 @@ public class FileManager {
 
 
                 if(key != null){
-                    if(!key.isBlank() && !value.isBlank()){
+                    if(!key.isBlank()){
 
                         key = key.replaceAll(Pattern.quote("\\n"), "\n");
                         value = value.replaceAll(Pattern.quote("\\n"), "\n").trim();
@@ -91,6 +95,100 @@ public class FileManager {
 
     }
 
+    public boolean updateTranslationKey(String oldKey, String newKey){
+        newKey = newKey.replaceAll("\\s+","");
+        if(!isLoaded || oldKey.equals(newKey)) return false;
+
+        if(!translations.containsKey(oldKey)){
+            if(!filePanel.isSource()) return false;
+            System.err.println("Key " + oldKey + " does not exists in " + filePanel.type.name() + " (updateTranslationKey)");
+            return false;
+        }
+
+        translations.get(oldKey).setKey(newKey);
+        translations.put(newKey, translations.get(oldKey));
+        translations.remove(oldKey);
+
+        saveTranslations();
+
+        if(filePanel.isSource()){
+            filePanel.getWindow().alternativeTranslation.fileManager.updateTranslationKey(oldKey, newKey);
+            filePanel.getWindow().targetTranslation.fileManager.updateTranslationKey(oldKey, newKey);
+            Platform.runLater(() -> filePanel.translationsListUpdated());
+        }
+        return true;
+    }
+    public boolean updateTranslationValue(String key, String newValue){
+        if(!isLoaded) return false;
+        if(!translations.containsKey(key)){
+            translations.put(key, new Translation(new ArrayList<>(), key, newValue));
+        }else{
+            if(translations.get(key).getValue().equals(newValue)) return false;
+            translations.get(key).setValue(newValue);
+        }
+        saveTranslations();
+        return true;
+    }
+    public boolean updateTranslationComment(String key, List<String> newComments){
+        if(!isLoaded) return false;
+        if(!translations.containsKey(key)){
+            System.err.println("Key " + key + " does not exists in " + filePanel.type.name() + " (updateTranslationValue)");
+            return false;
+        }
+        if(!filePanel.isSource()) System.err.println("updateTranslationComment method must be called on sourceTranslation only");
+
+        translations.get(key).setComments(newComments);
+        saveTranslations();
+
+        filePanel.getWindow().alternativeTranslation.saveTranslations();
+        filePanel.getWindow().targetTranslation.saveTranslations();
+        return true;
+    }
+
+    public void saveTranslations() {
+        try {
+            saveTranslations(file);
+            filePanel.updateStatus();
+        } catch (IOException e) {
+            e.printStackTrace();
+            DialogBuilder.showErrorAlert(filePanel.getWindow(), "Unable to save translation file " + file.getAbsolutePath(), e.getMessage(), false);
+        }
+    }
+
+    private void saveTranslations(File file) throws IOException {
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8, false));
+
+        HashMap<String, Translation> sourceTranslations = filePanel.getSourceTranslations();
+
+        for(Translation sourceTranslation : sourceTranslations.values().stream().sorted().collect(Collectors.toList())){
+            String key = sourceTranslation.getKey();
+
+            for(String comment : sourceTranslations.get(key).getComments()){
+                if(comment.isBlank()) continue;
+                if(comment.startsWith("#")) writer.write(comment.trim());
+                else writer.write("# " + comment.trim());
+                writer.newLine();
+            }
+
+            if(translations.containsKey(key)){
+                writer.write(key + "=" + translations.get(key).getValue().replace("\n", "\\n"));
+            }else{
+                writer.write(key + "=");
+            }
+
+            writer.newLine();
+        }
+
+        writer.flush();
+        writer.close();
+
+
+    }
+
+    public HashMap<String, Translation> getSourceComments(){
+        return filePanel.getSourceTranslations();
+    }
 
     public HashMap<String, Translation> getTranslations() {
         return translations;

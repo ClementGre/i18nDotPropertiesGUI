@@ -4,9 +4,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
-import javafx.stage.Window;
 
 import java.io.File;
+import java.nio.file.attribute.UserPrincipalLookupService;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class FilePanel {
 
@@ -17,15 +19,17 @@ public class FilePanel {
     private Label fileName;
     private TextField field;
     private Button browse;
-    private TranslationFileType type;
+    private Label status;
+
+    public TranslationFileType type;
     private MainWindowController mainWindow;
+    public FileManager fileManager;
 
-    private FileManager fileManager;
-
-    public FilePanel(Label fileName, TextField field, Button browse, TranslationFileType type, MainWindowController mainWindow) {
+    public FilePanel(Label fileName, TextField field, Button browse, Label status, TranslationFileType type, MainWindowController mainWindow) {
         this.fileName = fileName;
         this.field = field;
         this.browse = browse;
+        this.status = status;
         this.type = type;
         this.mainWindow = mainWindow;
 
@@ -53,29 +57,62 @@ public class FilePanel {
             if(file.exists()){
                 fileName.setText(file.getName());
                 fileManager.updateFile(file);
+                updateStatus();
             }else{
                 fileName.setText("No file selected");
                 fileManager.updateFile(null);
+                updateStatus();
             }
         });
 
     }
 
-    public void translationsListUpdated(){
-        if(type == TranslationFileType.SOURCE){
-            mainWindow.translations.updateKeys(fileManager.getTranslations());
+    public void updateStatus(){
+        if(fileManager.hasTranslations()){
+            status.setText(getStatusText());
         }else{
-            System.out.println("updated");
-            mainWindow.translations.updateKeys(mainWindow.sourceTranslation.fileManager.getTranslations());
+            status.setText(null);
         }
     }
 
-    public Window getWindow(){
+    private String getStatusText(){
+        HashMap<String, Translation> translations = getTranslations();
+        int count = translations.size();
+        int completed = (int) translations.values().stream().filter((t) -> !t.getValue().isBlank()).count();
+        int percentage = 100 * completed/count;
+
+        return type.name().toLowerCase() + " : " + completed + "/" + count + " (" + percentage + "%)";
+
+    }
+
+    public void saveTranslations(){
+        fileManager.saveTranslations();
+    }
+
+    public void translationsListUpdated(){
+        if(type == TranslationFileType.SOURCE){
+            mainWindow.translations.updateKeys(getTranslations());
+        }else{
+            mainWindow.translations.updateKeys(getSourceTranslations());
+        }
+    }
+
+    public MainWindowController getWindow(){
         return mainWindow;
+    }
+
+    public boolean isSource(){
+        return type == TranslationFileType.SOURCE;
     }
 
     public Translation getTranslation(String key){
         return fileManager.getTranslation(key);
+    }
+    public HashMap<String, Translation> getTranslations(){
+        return fileManager.getTranslations();
+    }
+    public HashMap<String, Translation> getSourceTranslations(){
+        return mainWindow.sourceTranslation.fileManager.getTranslations();
     }
 
     public boolean hasTranslations(){

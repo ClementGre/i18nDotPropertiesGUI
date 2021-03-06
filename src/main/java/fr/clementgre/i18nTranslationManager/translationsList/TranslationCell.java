@@ -3,14 +3,14 @@ package fr.clementgre.i18nTranslationManager.translationsList;
 import fr.clementgre.i18nTranslationManager.Translation;
 import fr.clementgre.i18nTranslationManager.utils.FitTextArea;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 
 public class TranslationCell extends ListCell<String>{
@@ -18,6 +18,8 @@ public class TranslationCell extends ListCell<String>{
     public enum TextType {
         KEY, COMMENT, SOURCE, ALTERNATIVE, TARGET
     }
+
+    private String style = "";
 
     private String lastKey = "";
 
@@ -44,7 +46,6 @@ public class TranslationCell extends ListCell<String>{
 
     public void setupGraphic(){
 
-
         keyText = new TranslationSemiInput(this, TextType.KEY);
         commentsText = new TranslationSemiInput(this, TextType.COMMENT);
         sourceText = new TranslationSemiInput(this, TextType.SOURCE);
@@ -53,12 +54,12 @@ public class TranslationCell extends ListCell<String>{
         targetText.setStyle("-fx-font-size: 14;");
 
         bar.setPrefHeight(2);
-        bar.setStyle("-fx-background-color: #0078D7");
+        bar.setStyle("-fx-background-color: #9f0000");
 
-        if(listView.compactMode){
+        if(listView.isCompactMode()){
             VBox.setMargin(bar, new Insets(0, 0, 2, 0));
         }else{
-            VBox.setMargin(bar, new Insets(0, 0, 5, 0));
+            VBox.setMargin(bar, new Insets(0, 0, 3, 0));
         }
 
         pane.setOnMouseClicked((e) -> {
@@ -68,18 +69,19 @@ public class TranslationCell extends ListCell<String>{
         targetText.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if(!newValue){
                 targetText.setText(targetText.getText().trim());
-                publishEditAuto(TranslationCell.TextType.TARGET, newValue.toString());
+                publishEditAuto(TranslationCell.TextType.TARGET, targetText.getText());
             }else{
                 listView.getSelectionModel().select(lastKey);
             }
         });
 
+        setStyle("-fx-padding: 0 7 7 7;");
         listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue != null && newValue.equals(lastKey)){
                 targetText.requestFocus();
-                setStyle("-fx-background-color: #f3f3f3;");
+                setStyle("-fx-padding: 0 7 7 7; -fx-background-color: #f3f3f3;");
             }else{
-                setStyle("");
+                setStyle("-fx-padding: 0 7 7 7;");
             }
         });
 
@@ -135,15 +137,27 @@ public class TranslationCell extends ListCell<String>{
 
 
             }
-
-            if(listView.getWindow().alternativeTranslation.hasTranslations()){
-                if(!listView.compactMode){
+            if(!listView.isCompactMode()){
+                if(listView.getWindow().alternativeTranslation.hasTranslations()){
                     pane.getChildren().setAll(bar, keyText, sourceText, alternativeText, commentsText, targetText);
-                }
-            }else{
-                if(!listView.compactMode){
+                }else{
                     pane.getChildren().setAll(bar, keyText, sourceText, commentsText, targetText);
                 }
+
+                keyText.label.setPadding(new Insets(3, 8, 5, 8));
+                sourceText.label.setPadding(new Insets(6, 10, 3, 10));
+                sourceText.labelStyle = "-fx-font-size: 14;";
+                sourceText.fieldStyle = "-fx-font-size: 14;";
+                sourceText.fieldDefaultHeight = 30;
+                sourceText.setText(sourceText.getText());
+            }else{ // compact mode
+                pane.getChildren().setAll(bar, keyText, sourceText, targetText);
+                keyText.label.setPadding(new Insets(0));
+                sourceText.label.setPadding(new Insets(0));
+                sourceText.labelStyle = "-fx-font-size: 12;";
+                sourceText.fieldStyle = "-fx-font-size: 12;";
+                sourceText.fieldDefaultHeight = 25;
+                sourceText.setText(sourceText.getText());
             }
 
             setGraphic(pane);
@@ -183,6 +197,14 @@ public class TranslationCell extends ListCell<String>{
         if(key == null){
             System.out.println("key == null, unable to edit the translation");
             return;
+        }
+
+        switch (type){
+            case KEY -> listView.editedSinceLastSort = listView.getWindow().sourceTranslation.fileManager.updateTranslationKey(key, value);
+            case SOURCE -> listView.editedSinceLastSort = listView.getWindow().sourceTranslation.fileManager.updateTranslationValue(key, value);
+            case ALTERNATIVE -> listView.editedSinceLastSort = listView.getWindow().alternativeTranslation.fileManager.updateTranslationValue(key, value);
+            case COMMENT -> listView.editedSinceLastSort = listView.getWindow().sourceTranslation.fileManager.updateTranslationComment(key, Arrays.asList(value.split(Pattern.quote("\n"))));
+            case TARGET -> listView.editedSinceLastSort = listView.getWindow().targetTranslation.fileManager.updateTranslationValue(key, value);
         }
 
     }

@@ -4,7 +4,7 @@ import fr.clementgre.i18nTranslationManager.utils.DialogBuilder;
 import fr.clementgre.i18nTranslationManager.utils.StringUtils;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.StandardCharsets;;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -60,7 +60,7 @@ public class FileManager {
 
             if(!line.isBlank()){
                 if(line.startsWith("#")){
-                    translation.addComment(line);
+                    translation.addComment(line.trim());
                     continue;
                 }
 
@@ -72,7 +72,7 @@ public class FileManager {
                     if(!key.isBlank() && !value.isBlank()){
 
                         key = key.replaceAll(Pattern.quote("\\n"), "\n");
-                        value = value.replaceAll(Pattern.quote("\\n"), "\n");
+                        value = value.replaceAll(Pattern.quote("\\n"), "\n").trim();
 
                         translation.setKey(key);
                         translation.setValue(value);

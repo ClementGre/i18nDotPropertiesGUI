@@ -1,7 +1,12 @@
 package fr.clementgre.i18nTranslationManager.utils;
 
+import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
+
+import javax.swing.event.ChangeListener;
 
 public class FitTextArea extends TextArea {
 
@@ -29,14 +34,20 @@ public class FitTextArea extends TextArea {
 
         setMinHeight(0);
         setWrapText(true);
-        updateHeight();
+        Platform.runLater(this::updateHeight);
 
         textProperty().addListener((ov, oldVal, newVal) -> {
-            updateHeight();
+            Platform.runLater(this::updateHeight);
+        });
+        styleProperty().addListener((ov, oldVal, newVal) -> {
+            Platform.runLater(this::updateHeight);
+        });
+        getChildren().addListener((ListChangeListener<Node>) c -> {
+            Platform.runLater(this::updateHeight);
         });
     }
 
-    private void updateHeight(){
+    public void updateHeight(){
         Text t = (Text) lookup(".text");
         if(t == null){
             setHeightAuto(defaultHeight);

@@ -2,11 +2,15 @@ package fr.clementgre.i18nTranslationManager.translationsList;
 
 import fr.clementgre.i18nTranslationManager.Translation;
 import fr.clementgre.i18nTranslationManager.utils.FitTextArea;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.ListCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 
 
 public class TranslationCell extends ListCell<String>{
@@ -24,9 +28,11 @@ public class TranslationCell extends ListCell<String>{
     private TranslationSemiInput sourceText;
     private TranslationSemiInput alternativeText;
 
-    private FitTextArea targetText;
+    public FitTextArea targetText;
 
     private Region bar = new Region();
+
+    private boolean pressed = false;
 
     public TranslationsListView listView;
     public TranslationCell(TranslationsListView listView) {
@@ -49,13 +55,52 @@ public class TranslationCell extends ListCell<String>{
         bar.setPrefHeight(2);
         bar.setStyle("-fx-background-color: #0078D7");
 
-        VBox.setMargin(bar, new Insets(0, 0, 5, 0));
+        if(listView.compactMode){
+            VBox.setMargin(bar, new Insets(0, 0, 2, 0));
+        }else{
+            VBox.setMargin(bar, new Insets(0, 0, 5, 0));
+        }
 
-        pane.getChildren().addAll(bar, keyText, commentsText, sourceText, alternativeText, targetText);
+        pane.setOnMouseClicked((e) -> {
+            listView.getSelectionModel().select(lastKey);
+        });
 
         targetText.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            publishEditAuto(TranslationCell.TextType.TARGET, newValue.toString());
+            if(!newValue){
+                targetText.setText(targetText.getText().trim());
+                publishEditAuto(TranslationCell.TextType.TARGET, newValue.toString());
+            }else{
+                listView.getSelectionModel().select(lastKey);
+            }
         });
+
+        listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue != null && newValue.equals(lastKey)){
+                targetText.requestFocus();
+                setStyle("-fx-background-color: #f3f3f3;");
+            }else{
+                setStyle("");
+            }
+        });
+
+        targetText.addEventFilter(KeyEvent.KEY_RELEASED, e -> {
+            if((e.isShiftDown() && (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP)) || e.getCode() == KeyCode.TAB){
+                if(pressed){
+                    if(e.getCode() == KeyCode.UP) selectPrevious(lastKey);
+                    else selectNext(lastKey);
+                    pressed = false;
+                }
+                e.consume();
+            }
+        });
+
+        targetText.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if((e.isShiftDown() && (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP)) || e.getCode() == KeyCode.TAB){
+                e.consume();
+                pressed = true;
+            }
+        });
+
 
     }
 
@@ -88,10 +133,20 @@ public class TranslationCell extends ListCell<String>{
                 alternativeText.setText(getText(TextType.ALTERNATIVE, key));
                 targetText.setText(getText(TextType.TARGET, key));
 
+
+            }
+
+            if(listView.getWindow().alternativeTranslation.hasTranslations()){
+                if(!listView.compactMode){
+                    pane.getChildren().setAll(bar, keyText, sourceText, alternativeText, commentsText, targetText);
+                }
+            }else{
+                if(!listView.compactMode){
+                    pane.getChildren().setAll(bar, keyText, sourceText, commentsText, targetText);
+                }
             }
 
             setGraphic(pane);
-
             lastKey = key;
         }
 
@@ -130,5 +185,16 @@ public class TranslationCell extends ListCell<String>{
             return;
         }
 
+    }
+
+    public void selectNext(String key){
+        listView.getSelectionModel().select(key);
+        Platform.runLater(() -> listView.scrollTo(listView.getSelectionModel().getSelectedIndex()));
+        Platform.runLater(() -> listView.getSelectionModel().selectNext());
+    }
+    public void selectPrevious(String key){
+        listView.getSelectionModel().select(key);
+        Platform.runLater(() -> listView.scrollTo(listView.getSelectionModel().getSelectedIndex()));
+        Platform.runLater(() -> listView.getSelectionModel().selectPrevious());
     }
 }

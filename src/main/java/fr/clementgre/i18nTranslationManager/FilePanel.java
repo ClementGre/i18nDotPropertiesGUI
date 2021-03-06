@@ -64,6 +64,9 @@ public class FilePanel {
     public void translationsListUpdated(){
         if(type == TranslationFileType.SOURCE){
             mainWindow.translations.updateKeys(fileManager.getTranslations());
+        }else{
+            System.out.println("updated");
+            mainWindow.translations.updateKeys(mainWindow.sourceTranslation.fileManager.getTranslations());
         }
     }
 

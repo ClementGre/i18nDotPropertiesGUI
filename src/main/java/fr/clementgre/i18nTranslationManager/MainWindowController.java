@@ -59,7 +59,7 @@ public class MainWindowController extends Stage {
             contentPane.getChildren().add(translations);
 
             sourceTranslationField.setText("C:\\Users\\Clement\\Developpement\\Java\\PDF4Teachers\\src\\main\\resources\\translations\\strings_fr_fr.properties");
-            //alternativeTranslationField.setText("C:\\Users\\Clement\\Developpement\\Java\\PDF4Teachers\\src\\main\\resources\\translations\\strings_it_it.properties");
+            alternativeTranslationField.setText("C:\\Users\\Clement\\Developpement\\Java\\PDF4Teachers\\src\\main\\resources\\translations\\strings_fr_fr.properties");
             targetTranslationField.setText("C:\\Users\\Clement\\Developpement\\Java\\PDF4Teachers\\src\\main\\resources\\translations\\strings_en_us.properties");
 
         });

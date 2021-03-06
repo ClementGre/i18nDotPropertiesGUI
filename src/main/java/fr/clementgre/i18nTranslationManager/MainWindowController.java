@@ -1,10 +1,9 @@
 package fr.clementgre.i18nTranslationManager;
 
+import fr.clementgre.i18nTranslationManager.translationsList.TranslationsListView;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -14,15 +13,17 @@ import jfxtras.styles.jmetro.Style;
 
 public class MainWindowController extends Stage {
 
-    FilePanel sourceTranslation;
-    FilePanel alternativeTranslation;
-    FilePanel targetTranslation;
+    public FilePanel sourceTranslation;
+    public FilePanel alternativeTranslation;
+    public FilePanel targetTranslation;
 
     //
 
     public MenuBar menuBar;
     public VBox contentPane;
     public HBox bottomBar;
+
+    //
 
     public Label sourceTranslationText;
     public TextField sourceTranslationField;
@@ -36,6 +37,9 @@ public class MainWindowController extends Stage {
     public TextField targetTranslationField;
     public Button targetTranslationBrowse;
 
+
+    public TranslationsListView translations;
+
     @FXML
     public void initialize(){
 
@@ -45,9 +49,20 @@ public class MainWindowController extends Stage {
         bottomBar.getStyleClass().add(JMetroStyleClass.BACKGROUND);
 
 
-        sourceTranslation = new FilePanel(sourceTranslationText, sourceTranslationField, sourceTranslationBrowse, FilePanel.TranslationFileType.SOURCE, this);
-        alternativeTranslation = new FilePanel(alternativeTranslationText, alternativeTranslationField, alternativeTranslationBrowse, FilePanel.TranslationFileType.ALTERNATIVE, this);
-        targetTranslation = new FilePanel(targetTranslationText, targetTranslationField, targetTranslationBrowse, FilePanel.TranslationFileType.TARGET, this);
+        Platform.runLater(() -> {
+            sourceTranslation = new FilePanel(sourceTranslationText, sourceTranslationField, sourceTranslationBrowse, FilePanel.TranslationFileType.SOURCE, this);
+            alternativeTranslation = new FilePanel(alternativeTranslationText, alternativeTranslationField, alternativeTranslationBrowse, FilePanel.TranslationFileType.ALTERNATIVE, this);
+            targetTranslation = new FilePanel(targetTranslationText, targetTranslationField, targetTranslationBrowse, FilePanel.TranslationFileType.TARGET, this);
+
+            translations = new TranslationsListView(this);
+
+            contentPane.getChildren().add(translations);
+
+            sourceTranslationField.setText("C:\\Users\\Clement\\Developpement\\Java\\PDF4Teachers\\src\\main\\resources\\translations\\strings_fr_fr.properties");
+            //alternativeTranslationField.setText("C:\\Users\\Clement\\Developpement\\Java\\PDF4Teachers\\src\\main\\resources\\translations\\strings_it_it.properties");
+            targetTranslationField.setText("C:\\Users\\Clement\\Developpement\\Java\\PDF4Teachers\\src\\main\\resources\\translations\\strings_en_us.properties");
+
+        });
 
 
 

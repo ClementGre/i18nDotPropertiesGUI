@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Translation implements Comparable<Translation>{
 
-    private ArrayList<String> comments;
+    private ArrayList<String> comments = new ArrayList<>();
     private String key;
     private String value;
 

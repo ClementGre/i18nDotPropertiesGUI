@@ -18,16 +18,18 @@ public class FilePanel {
     private TextField field;
     private Button browse;
     private TranslationFileType type;
-    private Window mainWindow;
+    private MainWindowController mainWindow;
 
-    private FileManager fileManager = new FileManager(this);
+    private FileManager fileManager;
 
-    public FilePanel(Label fileName, TextField field, Button browse, TranslationFileType type, Window mainWindow) {
+    public FilePanel(Label fileName, TextField field, Button browse, TranslationFileType type, MainWindowController mainWindow) {
         this.fileName = fileName;
         this.field = field;
         this.browse = browse;
         this.type = type;
         this.mainWindow = mainWindow;
+
+        fileManager = new FileManager(this);
 
         setup();
     }
@@ -50,11 +52,30 @@ public class FilePanel {
             File file = new File(field.getText());
             if(file.exists()){
                 fileName.setText(file.getName());
+                fileManager.updateFile(file);
             }else{
                 fileName.setText("No file selected");
+                fileManager.updateFile(null);
             }
-            // update
         });
 
+    }
+
+    public void translationsListUpdated(){
+        if(type == TranslationFileType.SOURCE){
+            mainWindow.translations.updateKeys(fileManager.getTranslations());
+        }
+    }
+
+    public Window getWindow(){
+        return mainWindow;
+    }
+
+    public Translation getTranslation(String key){
+        return fileManager.getTranslation(key);
+    }
+
+    public boolean hasTranslations(){
+        return fileManager.hasTranslations();
     }
 }

@@ -3,6 +3,8 @@ package fr.clementgre.i18nTranslationManager.translationsList;
 import fr.clementgre.i18nTranslationManager.MainWindowController;
 import fr.clementgre.i18nTranslationManager.Translation;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ListView;
 
@@ -16,19 +18,22 @@ public class TranslationsListView extends ListView<String> {
 
     private MainWindowController mainWindow;
     public boolean editedSinceLastSort = false;
+    public BooleanProperty needRefresh = new SimpleBooleanProperty(false);
 
     public TranslationsListView(MainWindowController mainWindow){
         this.mainWindow = mainWindow;
 
-        setCellFactory(listView -> new TranslationCell(this));
+        setCellFactory(listView -> new TranslationCell(this, needRefresh));
         prefHeightProperty().bind(mainWindow.contentPane.heightProperty());
 
         mainWindow.sortMode.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             sortAuto();
+            getWindow().prefs.putInt("displayModes.sortMode", newValue.intValue());
         });
-        mainWindow.smallMode.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        mainWindow.compactMode.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             setItems(null);
             Platform.runLater(() -> sortAuto());
+            getWindow().prefs.putInt("displayModes.compactMode", newValue.intValue());
         });
 
         getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -41,7 +46,10 @@ public class TranslationsListView extends ListView<String> {
     }
 
     public boolean isCompactMode(){
-        return mainWindow.smallMode.isSelected();
+        return mainWindow.compactMode.getSelectionModel().getSelectedIndex() == 1;
+    }
+    public boolean isOneLineMode(){
+        return mainWindow.compactMode.getSelectionModel().getSelectedIndex() == 2;
     }
 
     public void updateKeys(HashMap<String, Translation> sourceTranslations){
@@ -51,6 +59,7 @@ public class TranslationsListView extends ListView<String> {
         }else{
             setItems(null);
         }
+        needRefresh.setValue(!needRefresh.getValue());
     }
 
     public void sortAuto(){
@@ -76,10 +85,17 @@ public class TranslationsListView extends ListView<String> {
         return translations;
     }
     private int getTranslationSortValue(Translation translation){
-        int sourceTranslation = getWindow().sourceTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 10;
-        int targetTranslation = getWindow().targetTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 5;
-        int alternativeTranslation = getWindow().alternativeTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 1;
-        return sourceTranslation + targetTranslation + alternativeTranslation;
+
+        int output = 0;
+        output += getWindow().sourceTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 10;
+
+        if(getWindow().targetTranslation.getTranslation(translation.getKey()) != null)
+            output += getWindow().targetTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 5;
+        if(getWindow().alternativeTranslation.hasTranslations())
+            if(getWindow().alternativeTranslation.getTranslation(translation.getKey()) != null)
+                output += getWindow().alternativeTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 1;
+
+        return output;
     }
     private List<String> toKeyList(List<Translation> translations){
         return translations.stream().map(Translation::getKey).collect(Collectors.toList());

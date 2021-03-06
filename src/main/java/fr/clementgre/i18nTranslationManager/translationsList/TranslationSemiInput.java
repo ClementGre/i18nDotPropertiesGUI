@@ -3,12 +3,13 @@ package fr.clementgre.i18nTranslationManager.translationsList;
 
 import fr.clementgre.i18nTranslationManager.utils.FitTextArea;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 
-public class TranslationSemiInput extends Region {
+public class TranslationSemiInput extends Pane {
 
     public final Label label = new Label();
     public FitTextArea textArea;
@@ -29,11 +30,24 @@ public class TranslationSemiInput extends Region {
             if(e.getClickCount() == 2) loadTextArea();
         });
         label.setWrapText(true);
-        label.maxWidthProperty().bind(cell.pane.widthProperty());
+
+        label.maxWidthProperty().bind(cell.listView.widthProperty().subtract(30));
+
+        label.textProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                if(textArea == null) setPrefHeight(label.getHeight());
+            });
+        });
+        label.heightProperty().addListener((observable, oldValue, newValue) -> {
+            Platform.runLater(() -> {
+                if(textArea == null) setPrefHeight(label.getHeight());
+            });
+        });
 
         if(type == TranslationCell.TextType.KEY){
-            label.layoutXProperty().bind(cell.pane.widthProperty().subtract(label.widthProperty()).divide(2));
             labelStyle = "-fx-text-fill: #1b9dc9;";
+            label.setPadding(new Insets(0));
+
         }else if(type == TranslationCell.TextType.COMMENT){
             labelStyle = "-fx-text-fill: #767676;";
             label.setPadding(new Insets(3, 8, 5, 8));
@@ -52,6 +66,59 @@ public class TranslationSemiInput extends Region {
         getChildren().add(label);
     }
 
+    public void updateGraphics(){
+
+
+        if(type == TranslationCell.TextType.KEY){
+            if(cell.listView.isOneLineMode()){
+                label.setPrefWidth(TranslationCell.KEY_PX);
+                label.layoutXProperty().unbind();
+                label.setLayoutX(0);
+                label.setPadding(new Insets(0));
+
+            }else{
+                label.setPrefWidth(-1);
+                label.layoutXProperty().bind(cell.pane.widthProperty().subtract(label.widthProperty()).divide(2));
+
+                if(cell.listView.isCompactMode()){
+                    label.setPadding(new Insets(0));
+                }else{
+                    label.setPadding(new Insets(3, 8, 5, 8));
+                }
+            }
+
+        }else if(type == TranslationCell.TextType.SOURCE){
+            if(cell.listView.isOneLineMode()){
+                label.setPrefWidth(TranslationCell.SOURCE_PX);
+            }else{
+                label.setPrefWidth(-1);
+            }
+
+            if(cell.listView.isOneLineMode() || cell.listView.isCompactMode()){
+                label.setPadding(new Insets(0));
+                labelStyle = "-fx-font-size: 12;";
+                fieldStyle = "-fx-font-size: 12;";
+                fieldDefaultHeight = 25;
+            }else{
+                label.setPadding(new Insets(6, 10, 3, 10));
+                labelStyle = "-fx-font-size: 14;";
+                fieldStyle = "-fx-font-size: 14;";
+                fieldDefaultHeight = 30;
+            }
+
+            setText(getText());
+
+        }
+
+        if(cell.listView.isOneLineMode()){
+            label.layoutYProperty().bind(heightProperty().subtract(label.heightProperty()).divide(2));
+        }else{
+            label.layoutYProperty().unbind();
+            label.setLayoutY(0);
+        }
+
+    }
+
     public void loadTextArea(){
         if(textArea != null) return;
         Platform.runLater(() -> {
@@ -59,11 +126,26 @@ public class TranslationSemiInput extends Region {
             textArea.setStyle(fieldStyle);
             textArea.setPadding(new Insets(-1));
 
-            textArea.prefWidthProperty().bind(cell.pane.widthProperty());
+            prefHeightProperty().unbind();
+            textArea.heightProperty().addListener((observable, oldValue, newValue) -> {
+                Platform.runLater(() -> setPrefHeight(newValue.doubleValue()));
+            });
+
+            if(cell.listView.isOneLineMode()) textArea.prefWidthProperty().bind(new SimpleIntegerProperty(TranslationCell.SOURCE_PX));
+            else textArea.prefWidthProperty().bind(cell.pane.widthProperty().subtract(20));
+
             getChildren().setAll(textArea);
             textArea.requestFocus();
 
             textArea.textProperty().addListener((observable, oldValue, newValue) -> {
+                if(type == TranslationCell.TextType.KEY){
+                    String adjustedValue = newValue.trim().replaceAll("\\s+","").replace("\n", "");
+                    if(adjustedValue != newValue){
+                        textArea.setText(adjustedValue);
+                        if(newValue.contains("\n")) cell.targetText.requestFocus();
+                        return;
+                    }
+                }
                 setText(newValue);
             });
 
@@ -92,8 +174,22 @@ public class TranslationSemiInput extends Region {
     }
 
     private void publishEdit(){
-        if(hasText) cell.publishEditAuto(type, label.getText());
-        else cell.publishEditAuto(type, "");
+        String value = hasText ? label.getText() : "";
+
+        if(type == TranslationCell.TextType.KEY && !value.equals(cell.lastKey)){
+            int i = 0;
+            String newValue = value;
+            while(newValue.isBlank() || cell.listView.getWindow().sourceTranslation.getTranslation(newValue) != null){ // check translation do not already exists
+                i++;
+                newValue = (value.isBlank() ? "unknown." : value+".") + i;
+            }
+            if(value != newValue){
+                value = newValue;
+                setText(value);
+            }
+        }
+
+        cell.publishEditAuto(type, value);
     }
 
     public String getText(){

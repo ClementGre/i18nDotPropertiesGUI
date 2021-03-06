@@ -45,6 +45,9 @@ public class FitTextArea extends TextArea {
         getChildren().addListener((ListChangeListener<Node>) c -> {
             Platform.runLater(this::updateHeight);
         });
+        widthProperty().addListener((ov, oldVal, newVal)-> {
+            Platform.runLater(this::updateHeight);
+        });
     }
 
     public void updateHeight(){

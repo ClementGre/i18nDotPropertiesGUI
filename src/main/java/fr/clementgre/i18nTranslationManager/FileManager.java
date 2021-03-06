@@ -16,7 +16,7 @@ public class FileManager {
 
     private HashMap<String, Translation> translations = new HashMap<>();
     private FilePanel filePanel;
-    private File file;
+    public File file;
     private boolean isLoaded = false;
 
     public FileManager(FilePanel filePanel) {
@@ -42,6 +42,7 @@ public class FileManager {
             loadTranslations(file);
             isLoaded = true;
             filePanel.translationsListUpdated();
+            filePanel.updateStatus();
         }catch(IOException e){
             e.printStackTrace();
             DialogBuilder.showErrorAlert(filePanel.getWindow(), "Unable to load translation file " + file.getAbsolutePath(), e.getMessage(), false);
@@ -145,7 +146,39 @@ public class FileManager {
         return true;
     }
 
+    public String addTranslation() {
+        String key = "";
+        int i = 0;
+        while(i == 0 || getTranslation(key) != null){ // check translation do not already exists
+            i++;
+            key = "unknown." + i;
+        }
+
+        translations.put(key, new Translation(new ArrayList<>(), key, ""));
+        saveTranslations();
+        filePanel.translationsListUpdated();
+        return key;
+
+    }
+    public void deleteTranslation(String key) {
+        if(!isLoaded) return;
+
+        if(translations.containsKey(key)){
+            translations.remove(key);
+
+            saveTranslations();
+
+            if(filePanel.isSource()){
+                filePanel.getWindow().alternativeTranslation.fileManager.deleteTranslation(key);
+                filePanel.getWindow().targetTranslation.fileManager.deleteTranslation(key);
+                Platform.runLater(() -> filePanel.translationsListUpdated());
+            }
+        }
+
+    }
+
     public void saveTranslations() {
+        if(!hasTranslations()) return;
         try {
             saveTranslations(file);
             filePanel.updateStatus();

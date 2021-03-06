@@ -1,5 +1,6 @@
 package fr.clementgre.i18nTranslationManager;
 
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -57,14 +58,23 @@ public class FilePanel {
             if(file.exists()){
                 fileName.setText(file.getName());
                 fileManager.updateFile(file);
-                updateStatus();
+                mainWindow.prefs.put("translationFilePath." + type.name().toLowerCase(), file.getAbsolutePath());
             }else{
                 fileName.setText("No file selected");
                 fileManager.updateFile(null);
-                updateStatus();
+                mainWindow.prefs.put("translationFilePath." + type.name().toLowerCase(), "");
             }
+            updateStatus();
         });
 
+        Platform.runLater(() -> {
+            field.setText(mainWindow.prefs.get("translationFilePath." + type.name().toLowerCase(), ""));
+        });
+
+    }
+
+    public void reloadFromDisk(){
+        fileManager.updateFile(fileManager.file);
     }
 
     public void updateStatus(){

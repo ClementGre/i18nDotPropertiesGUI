@@ -24,7 +24,7 @@ javafx {
 
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
-mainClassName = "fr.clementgre.i18nTranslationManager.Main"
+mainClassName = "fr.clementgre.i18nDotPropertiesGUI.Main"
 
 version = "1.0"
 description = ""
@@ -45,8 +45,8 @@ task packageRpm(type: Exec){
     workingDir project.projectDir
     commandLine = ["./gradlew", "jpackage", "-PinstallerType=rpm"]
 }
-sourceCompatibility = 15
-targetCompatibility = 15
+sourceCompatibility = 14
+targetCompatibility = 14
 
 jlink {
     options = [
@@ -56,7 +56,7 @@ jlink {
                 '--no-man-pages',
             ] as List<String>
     launcher {
-        name = 'i18nTranslationManager'
+        name = 'i18nDotPropertiesGUI'
     }
 
     if(Os.isFamily(Os.FAMILY_WINDOWS)){
@@ -93,7 +93,7 @@ jlink {
         }else if(installerType == 'dmg'){ // MAC
             imageOptions += ['--icon', 'src/main/resources/logo.icns']
             installerOptions += [
-                    "--mac-package-name", "i18nTranslationManager",
+                    "--mac-package-name", "i18nDotPropertiesGUI",
                     '--icon', 'src/main/resources/logo.icns'
             ]
         }else if(installerType in ['deb', 'rpm']){ // LINUX

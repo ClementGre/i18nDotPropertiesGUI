@@ -1,7 +1,7 @@
-package fr.clementgre.i18nTranslationManager;
+package fr.clementgre.i18nDotPropertiesGUI;
 
-import fr.clementgre.i18nTranslationManager.utils.DialogBuilder;
-import fr.clementgre.i18nTranslationManager.utils.StringUtils;
+import fr.clementgre.i18nDotPropertiesGUI.utils.DialogBuilder;
+import fr.clementgre.i18nDotPropertiesGUI.utils.StringUtils;
 import javafx.application.Platform;
 
 import java.io.*;

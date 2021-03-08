@@ -14,7 +14,7 @@
 <?import javafx.scene.control.MenuItem?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="fr.clementgre.i18nTranslationManager.MainWindowController">
+            fx:controller="fr.clementgre.i18nDotPropertiesGUI.MainWindowController">
 
     <top>
         <VBox prefHeight="0">
@@ -34,7 +34,7 @@
                 <VBox.margin><Insets left="20" right="20" top="10" bottom="10"/></VBox.margin>
 
                 <VBox>
-                    <Label text="i18nTranslationManager">
+                    <Label text="i18nDotPropertiesGUI">
                         <style>-fx-font-size: 24; -fx-fill: #0F0F0F;</style>
                     </Label>
                     <Label text="Clément Grennerat">

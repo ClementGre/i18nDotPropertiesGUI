@@ -1,4 +1,4 @@
-package fr.clementgre.i18nTranslationManager.utils;
+package fr.clementgre.i18nDotPropertiesGUI.utils;
 
 import javafx.geometry.Orientation;
 import javafx.scene.Node;

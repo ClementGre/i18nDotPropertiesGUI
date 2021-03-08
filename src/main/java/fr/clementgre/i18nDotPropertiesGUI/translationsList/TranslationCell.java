@@ -1,7 +1,7 @@
-package fr.clementgre.i18nTranslationManager.translationsList;
+package fr.clementgre.i18nDotPropertiesGUI.translationsList;
 
-import fr.clementgre.i18nTranslationManager.Translation;
-import fr.clementgre.i18nTranslationManager.utils.FitTextArea;
+import fr.clementgre.i18nDotPropertiesGUI.Translation;
+import fr.clementgre.i18nDotPropertiesGUI.utils.FitTextArea;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Insets;

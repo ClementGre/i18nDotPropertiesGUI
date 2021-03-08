@@ -1,4 +1,4 @@
-package fr.clementgre.i18nTranslationManager;
+package fr.clementgre.i18nDotPropertiesGUI;
 
 import java.util.ArrayList;
 import java.util.List;

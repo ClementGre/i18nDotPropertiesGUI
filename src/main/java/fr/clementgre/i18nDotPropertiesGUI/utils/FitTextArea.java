@@ -1,12 +1,10 @@
-package fr.clementgre.i18nTranslationManager.utils;
+package fr.clementgre.i18nDotPropertiesGUI.utils;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
-
-import javax.swing.event.ChangeListener;
 
 public class FitTextArea extends TextArea {
 

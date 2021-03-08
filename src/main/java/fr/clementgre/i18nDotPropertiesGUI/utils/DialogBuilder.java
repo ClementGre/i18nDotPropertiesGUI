@@ -1,14 +1,11 @@
-package fr.clementgre.i18nTranslationManager.utils;
+package fr.clementgre.i18nDotPropertiesGUI.utils;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 
-import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

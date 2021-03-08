@@ -1,6 +1,6 @@
-package fr.clementgre.i18nTranslationManager;
+package fr.clementgre.i18nDotPropertiesGUI;
 
-import fr.clementgre.i18nTranslationManager.translationsList.TranslationsListView;
+import fr.clementgre.i18nDotPropertiesGUI.translationsList.TranslationsListView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -66,7 +66,7 @@ public class MainWindowController extends Stage {
     @FXML
     public void initialize(){
 
-        prefs = Preferences.userRoot().node("fr.clementgre.i18nTranslationManager.MainWindowController");
+        prefs = Preferences.userRoot().node("fr.clementgre.i18nDotPropertiesGUI.MainWindowController");
 
         new JMetro(menuBar, Style.DARK);
         new JMetro(bottomBar, Style.DARK);

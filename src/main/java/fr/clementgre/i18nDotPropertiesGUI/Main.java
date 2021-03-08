@@ -1,4 +1,4 @@
-package fr.clementgre.i18nTranslationManager;
+package fr.clementgre.i18nDotPropertiesGUI;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,7 +15,7 @@ public class Main extends Application {
 
 
     public static void main(String[] args){
-        System.out.println("Starting i18nTranslationManager...");
+        System.out.println("Starting i18nDotPropertiesGUI...");
 
         ///// START APP /////
         launch(args);
@@ -32,7 +32,7 @@ public class Main extends Application {
         window.setMinHeight(400);
         window.setMinWidth(700);
 
-        window.setTitle("i18nTranslationManager");
+        window.setTitle("i18nDotPropertiesGUI");
         window.setScene(scene);
         window.show();
 

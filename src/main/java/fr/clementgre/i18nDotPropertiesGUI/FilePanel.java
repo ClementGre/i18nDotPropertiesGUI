@@ -1,4 +1,4 @@
-package fr.clementgre.i18nTranslationManager;
+package fr.clementgre.i18nDotPropertiesGUI;
 
 import javafx.application.Platform;
 import javafx.scene.control.Button;
@@ -7,9 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 public class FilePanel {
 

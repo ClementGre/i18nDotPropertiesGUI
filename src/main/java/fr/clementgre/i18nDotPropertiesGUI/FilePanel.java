@@ -99,9 +99,9 @@ public class FilePanel {
 
     public void translationsListUpdated(){
         if(type == TranslationFileType.SOURCE){
-            mainWindow.translations.updateKeys(getTranslations());
+            mainWindow.translationsPane.updateKeys(getTranslations());
         }else{
-            mainWindow.translations.updateKeys(getSourceTranslations());
+            mainWindow.translationsPane.updateKeys(getSourceTranslations());
         }
     }
 

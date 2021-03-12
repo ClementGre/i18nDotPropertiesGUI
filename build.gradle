@@ -16,6 +16,8 @@ dependencies{
         exclude group: 'org.openjfx'
     }
 
+    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.0'
+
 }
 javafx {
     version = '15'

@@ -1,6 +1,6 @@
 package fr.clementgre.i18nDotPropertiesGUI;
 
-import fr.clementgre.i18nDotPropertiesGUI.translationsList.TranslationsListView;
+import fr.clementgre.i18nDotPropertiesGUI.translationsPane.TranslationsPane;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -49,8 +49,7 @@ public class MainWindowController extends Stage {
     public Label targetTranslationText;
     public TextField targetTranslationField;
     public Button targetTranslationBrowse;
-
-    public TranslationsListView translations;
+    public TranslationsPane translationsPane;
 
     // bottom bar
 
@@ -73,32 +72,44 @@ public class MainWindowController extends Stage {
         menuBar.getStyleClass().add(JMetroStyleClass.BACKGROUND);
         bottomBar.getStyleClass().add(JMetroStyleClass.BACKGROUND);
 
-        sortMode.getSelectionModel().select(prefs.getInt("displayModes.sortMode", 0));
-        compactMode.getSelectionModel().select(prefs.getInt("displayModes.compactMode", 0));
-
         Platform.runLater(() -> {
+
+            // Translations loaders
             sourceTranslation = new FilePanel(sourceTranslationText, sourceTranslationField, sourceTranslationBrowse, sourceStatus, FilePanel.TranslationFileType.SOURCE, this);
             alternativeTranslation = new FilePanel(alternativeTranslationText, alternativeTranslationField, alternativeTranslationBrowse, alternativeStatus, FilePanel.TranslationFileType.ALTERNATIVE, this);
             targetTranslation = new FilePanel(targetTranslationText, targetTranslationField, targetTranslationBrowse, targetStatus, FilePanel.TranslationFileType.TARGET, this);
 
-            translations = new TranslationsListView(this);
-
-            contentPane.getChildren().add(translations);
+            // content Pane
+            translationsPane = new TranslationsPane(this);
+            contentPane.getChildren().add(translationsPane);
 
         });
+
+        // SETTINGS
+
+        sortMode.getSelectionModel().select(prefs.getInt("displayModes.sortMode", 0));
+        compactMode.getSelectionModel().select(prefs.getInt("displayModes.compactMode", 0));
+
+        sortMode.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            prefs.putInt("displayModes.sortMode", newValue.intValue());
+        });
+        compactMode.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            prefs.putInt("displayModes.compactMode", newValue.intValue());
+        });
+
+        // MENU BAR
 
         menuNew.setOnAction((e) -> {
             if(sourceTranslation.hasTranslations() && targetTranslation.hasTranslations()){
                 String key = sourceTranslation.fileManager.addTranslation();
                 Platform.runLater(() -> {
-                    translations.scrollTo(key);
-                    Platform.runLater(() -> translations.getSelectionModel().select(key));
+                    translationsPane.select(key);
                 });
 
             }
         });
         menuDelete.setOnAction((e) -> {
-            String key = translations.getSelectionModel().getSelectedItem();
+            String key = translationsPane.getSelected();
             if(key != null && !key.isBlank()){
                 sourceTranslation.fileManager.deleteTranslation(key);
             }

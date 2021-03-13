@@ -122,7 +122,7 @@ public class FileManager {
     public boolean updateTranslationValue(String key, String newValue){
         if(!isLoaded) return false;
         if(!translations.containsKey(key)){
-            translations.put(key, new Translation(new ArrayList<>(), key, newValue));
+            translations.put(key, new Translation(null, key, newValue));
         }else{
             if(translations.get(key).getValue().equals(newValue)) return false;
             translations.get(key).setValue(newValue);
@@ -130,7 +130,7 @@ public class FileManager {
         saveTranslations();
         return true;
     }
-    public boolean updateTranslationComment(String key, List<String> newComments){
+    public boolean updateTranslationComment(String key, String newComments){
         if(!isLoaded) return false;
         if(!translations.containsKey(key)){
             System.err.println("Key " + key + " does not exists in " + filePanel.type.name() + " (updateTranslationValue)");
@@ -154,7 +154,7 @@ public class FileManager {
             key = "unknown." + i;
         }
 
-        translations.put(key, new Translation(new ArrayList<>(), key, ""));
+        translations.put(key, new Translation(null, key, ""));
         saveTranslations();
         filePanel.translationsListUpdated();
         return key;
@@ -197,7 +197,7 @@ public class FileManager {
         for(Translation sourceTranslation : sourceTranslations.values().stream().sorted().collect(Collectors.toList())){
             String key = sourceTranslation.getKey();
 
-            for(String comment : sourceTranslations.get(key).getComments()){
+            for(String comment : sourceTranslations.get(key).getComments().split("\n")){
                 if(comment.isBlank()) continue;
                 if(comment.startsWith("#")) writer.write(comment.trim());
                 else writer.write("# " + comment.trim());

@@ -5,11 +5,11 @@ import java.util.List;
 
 public class Translation implements Comparable<Translation>{
 
-    private List<String> comments = new ArrayList<>();
+    private String comments;
     private String key;
     private String value;
 
-    public Translation(List<String> comments, String key, String value) {
+    public Translation(String comments, String key, String value) {
         this.comments = comments;
         this.key = key;
         this.value = value;
@@ -19,17 +19,16 @@ public class Translation implements Comparable<Translation>{
 
     }
 
-    public List<String> getComments() {
-        if(comments == null) return new ArrayList<>();
+    public String getComments() {
         return comments;
     }
-
-    public void setComments(List<String> comments) {
+    public void setComments(String comments) {
         this.comments = comments;
     }
 
     public void addComment(String comment) {
-        this.comments.add(comment);
+        if(this.comments == null) this.comments = comment;
+        else this.comments += "\n" + comment;
     }
 
     public String getKey() {

@@ -98,11 +98,7 @@ public class FilePanel {
     }
 
     public void translationsListUpdated(){
-        if(type == TranslationFileType.SOURCE){
-            mainWindow.translationsPane.updateKeys(getTranslations());
-        }else{
-            mainWindow.translationsPane.updateKeys(getSourceTranslations());
-        }
+        mainWindow.translationsPane.loadItems(getSourceTranslations(), getTargetTranslations(), getAlternativeTranslations());
     }
 
     public MainWindowController getWindow(){
@@ -121,6 +117,12 @@ public class FilePanel {
     }
     public HashMap<String, Translation> getSourceTranslations(){
         return mainWindow.sourceTranslation.fileManager.getTranslations();
+    }
+    public HashMap<String, Translation> getTargetTranslations(){
+        return mainWindow.targetTranslation.fileManager.getTranslations();
+    }
+    public HashMap<String, Translation> getAlternativeTranslations(){
+        return mainWindow.alternativeTranslation.fileManager.getTranslations();
     }
 
     public boolean hasTranslations(){

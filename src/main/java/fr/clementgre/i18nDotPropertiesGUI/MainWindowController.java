@@ -109,7 +109,7 @@ public class MainWindowController extends Stage {
             }
         });
         menuDelete.setOnAction((e) -> {
-            String key = translationsPane.getSelected();
+            String key = translationsPane.getSelected().getKey();
             if(key != null && !key.isBlank()){
                 sourceTranslation.fileManager.deleteTranslation(key);
             }

@@ -1,6 +1,6 @@
 package fr.clementgre.i18nDotPropertiesGUI;
 
-public class FullTranslation {
+public class FullTranslation implements Comparable<FullTranslation>{
 
     private String key;
     private String comments;
@@ -17,7 +17,7 @@ public class FullTranslation {
     }
 
     public String getKey() {
-        return key;
+        return key == null ? "" : key;
     }
 
     public void setKey(String key) {
@@ -54,5 +54,10 @@ public class FullTranslation {
 
     public void setTargetTranslation(String targetTranslation) {
         this.targetTranslation = targetTranslation;
+    }
+
+    @Override
+    public int compareTo(FullTranslation translation) {
+        return key.compareTo(translation.getKey());
     }
 }

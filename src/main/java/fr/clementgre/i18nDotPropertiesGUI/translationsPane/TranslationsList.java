@@ -3,13 +3,13 @@ package fr.clementgre.i18nDotPropertiesGUI.translationsPane;
 import fr.clementgre.i18nDotPropertiesGUI.FullTranslation;
 import fr.clementgre.i18nDotPropertiesGUI.MainWindowController;
 import fr.clementgre.i18nDotPropertiesGUI.Translation;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TranslationsList extends ListView<FullTranslation> {
@@ -17,6 +17,8 @@ public class TranslationsList extends ListView<FullTranslation> {
     MainWindowController mainWindow;
     public TranslationsList(MainWindowController mainWindow) {
         this.mainWindow = mainWindow;
+
+        setCellFactory(param -> new TranslationsListCell(getWindow()));
     }
 
     public ObservableList<FullTranslation> getTranslations(){
@@ -44,26 +46,26 @@ public class TranslationsList extends ListView<FullTranslation> {
     public FullTranslation getSelected(){
         return getSelectionModel().getSelectedItem();
     }
+    public ReadOnlyObjectProperty<FullTranslation> selectedProperty(){
+        return getSelectionModel().selectedItemProperty();
+    }
 
-    public void updateKeys(HashMap<String, Translation> sourceTranslations){
-        if(getWindow().sourceTranslation.hasTranslations() && getWindow().targetTranslation.hasTranslations()){
-            List<String> keys = toKeyList( sortItems(sourceTranslations) );
-            setItems(FXCollections.observableArrayList(keys));
-        }else{
+
+    public void loadItems(HashMap<String, Translation> source, HashMap<String, Translation> target, HashMap<String, Translation> alternate){
+        if(target.isEmpty() || source.isEmpty()){
             setItems(null);
+            return;
         }
+        List<FullTranslation> translations = source.values().stream().map((tr) ->
+            new FullTranslation(tr.getKey(), tr.getComments(), tr.getValue(),
+                    alternate.containsKey(tr.getKey()) ? alternate.get(tr.getKey()).getValue() : "",
+                    target.containsKey(tr.getKey()) ? target.get(tr.getKey()).getValue() : "")).collect(Collectors.toList());
+        setItems(FXCollections.observableList(translations));
     }
 
-    public void sortAuto(){
-        updateKeys(getWindow().sourceTranslation.getTranslations());
-    }
-
-    private List<Translation> sortItems(HashMap<String, Translation> sourceTranslations){
-        return sortItems(new ArrayList<>(sourceTranslations.values()));
-    }
-    private List<Translation> sortItems(List<Translation> translations){
+    public void sortItems(){
         if(getSortMode() == 0 || getSortMode() == -1){
-            translations.sort((o1, o2) -> {
+            getItems().sort((o1, o2) -> {
                 int v1 = getTranslationSortValue(o1);
                 int v2 = getTranslationSortValue(o2);
                 if(v1 == v2){
@@ -72,25 +74,30 @@ public class TranslationsList extends ListView<FullTranslation> {
                 return v1 - v2;
             });
         }else if (getSortMode() == 1){
-            translations.sort(Translation::compareTo);
+            getItems().sort(FullTranslation::compareTo);
         }
-        return translations;
     }
-    private int getTranslationSortValue(Translation translation){
-
+    private int getTranslationSortValue(FullTranslation translation){
         int output = 0;
-        output += getWindow().sourceTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 10;
-
-        if(getWindow().targetTranslation.getTranslation(translation.getKey()) != null)
-            output += getWindow().targetTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 5;
-        if(getWindow().alternativeTranslation.hasTranslations())
-            if(getWindow().alternativeTranslation.getTranslation(translation.getKey()) != null)
-                output += getWindow().alternativeTranslation.getTranslation(translation.getKey()).getValue().isBlank() ? 0 : 1;
-
+        output += translation.getSourceTranslation().isBlank() ? 0 : 10;
+        output += translation.getTargetTranslation().isBlank() ? 0 : 5;
+        output += translation.getAlternativeTranslation().isBlank() ? 0 : 1;
         return output;
     }
-    private List<String> toKeyList(List<Translation> translations){
-        return translations.stream().map(Translation::getKey).collect(Collectors.toList());
+    public Map<String, Translation> getSourceTranslations(){
+        return getItems().stream()
+                .map((tr) -> new Translation(tr.getComments(), tr.getKey(), tr.getSourceTranslation()) )
+                .collect(Collectors.toMap(Translation::getKey, tr -> tr));
+    }
+    public Map<String, Translation> getAlternativeTranslations(){
+        return getItems().stream()
+                .map((tr) -> new Translation(tr.getComments(), tr.getKey(), tr.getAlternativeTranslation()) )
+                .collect(Collectors.toMap(Translation::getKey, tr -> tr));
+    }
+    public Map<String, Translation> getTargetTranslations(){
+        return getItems().stream()
+                .map((tr) -> new Translation(tr.getComments(), tr.getKey(), tr.getTargetTranslation()) )
+                .collect(Collectors.toMap(Translation::getKey, tr -> tr));
     }
 
     private int getSortMode(){

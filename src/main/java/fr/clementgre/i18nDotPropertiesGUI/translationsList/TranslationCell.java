@@ -251,7 +251,7 @@ public class TranslationCell extends ListCell<String>{
             case KEY -> listView.editedSinceLastSort = listView.getWindow().sourceTranslation.fileManager.updateTranslationKey(key, value);
             case SOURCE -> listView.editedSinceLastSort = listView.getWindow().sourceTranslation.fileManager.updateTranslationValue(key, value);
             case ALTERNATIVE -> listView.editedSinceLastSort = listView.getWindow().alternativeTranslation.fileManager.updateTranslationValue(key, value);
-            case COMMENT -> listView.editedSinceLastSort = listView.getWindow().sourceTranslation.fileManager.updateTranslationComment(key, Arrays.asList(value.split(Pattern.quote("\n"))));
+            case COMMENT -> listView.editedSinceLastSort = listView.getWindow().sourceTranslation.fileManager.updateTranslationComment(key, value);
             case TARGET -> listView.editedSinceLastSort = listView.getWindow().targetTranslation.fileManager.updateTranslationValue(key, value);
         }
 

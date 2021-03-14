@@ -8,87 +8,92 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ComboBox?>
-<?import java.lang.String?>
-<?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.MenuItem?>
+<?import org.controlsfx.control.ToggleSwitch?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.clementgre.i18nDotPropertiesGUI.MainWindowController">
 
     <top>
-        <VBox prefHeight="0">
-            <style>-fx-background-color: #DDDDDD;</style>
+        <VBox prefHeight="0" fx:id="topBar">
 
-            <MenuBar fx:id="menuBar">
-                <style>-fx-use-system-menu-bar: true;</style>
-                <Menu text="File">
-                    <MenuItem fx:id="menuNew" text="New translation" mnemonicParsing="false" accelerator="Shortcut+N"/>
-                    <MenuItem fx:id="menuDelete" text="Delete selected translation" mnemonicParsing="false" accelerator="Shortcut+Shift+Delete"/>
-                    <MenuItem fx:id="menuReload" text="Reload from disk" mnemonicParsing="false" accelerator="Shortcut+R"/>
-                    <MenuItem fx:id="menuSave" text="Force save" mnemonicParsing="false" accelerator="Shortcut+S"/>
-                </Menu>
-            </MenuBar>
-
-            <HBox spacing="40">
-                <VBox.margin><Insets left="20" right="20" top="10" bottom="10"/></VBox.margin>
-
+            <HBox>
                 <VBox>
+                    <HBox>
+                        <MenuBar fx:id="menuBar">
+                            <style>-fx-background-color: #333333; -fx-padding: 0;</style>
+                            <Menu text="File">
+                                <style>-fx-padding: 6 15;</style>
+                                <MenuItem fx:id="menuReload" text="Reload from disk" mnemonicParsing="false" accelerator="Shortcut+R"/>
+                                <MenuItem fx:id="menuSave" text="Force save" mnemonicParsing="false" accelerator="Shortcut+S"/>
+                            </Menu>
+                        </MenuBar>
+
+                        <Label text="Clément Grennerat">
+                            <HBox.margin><Insets left="30" top="7"/></HBox.margin>
+                            <style>-fx-font-size: 14; -fx-fill: #565656;</style>
+                        </Label>
+                    </HBox>
+
+
                     <Label text="i18nDotPropertiesGUI">
+                        <VBox.margin><Insets left="20" right="20" top="4" bottom="4"/></VBox.margin>
                         <style>-fx-font-size: 24; -fx-fill: #0F0F0F;</style>
                     </Label>
-                    <Label text="Clément Grennerat">
-                        <style>-fx-font-size: 14; -fx-fill: #565656;</style>
-                    </Label>
+
+
                 </VBox>
 
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <VBox>
-                    <Label text="Source translation">
-                        <style>-fx-font-size: 14; -fx-fill: #565656;</style>
-                    </Label>
-                    <Label text="No file selected" fx:id="sourceTranslationText">
-                        <style>-fx-font-size: 12; -fx-fill: #565656;</style>
-                    </Label>
-                    <HBox>
-                        <TextField fx:id="sourceTranslationField"/>
-                        <Button text="..." fx:id="sourceTranslationBrowse">
-                            <style>-fx-font-size: 17; -fx-padding: -1 6 0 6;</style>
-                        </Button>
-                    </HBox>
-                </VBox>
+                <HBox spacing="30">
+                    <HBox.margin><Insets left="20" right="20" top="5" bottom="5"/></HBox.margin>
 
-                <VBox>
-                    <Label text="Alternative translation">
-                        <style>-fx-font-size: 14; -fx-fill: #565656;</style>
-                    </Label>
-                    <Label text="No file selected" fx:id="alternativeTranslationText">
-                        <style>-fx-font-size: 12; -fx-fill: #565656;</style>
-                    </Label>
-                    <HBox>
-                        <TextField fx:id="alternativeTranslationField"/>
-                        <Button text="..." fx:id="alternativeTranslationBrowse">
-                            <style>-fx-font-size: 17; -fx-padding: -1 6 0 6;</style>
-                        </Button>
-                    </HBox>
-                </VBox>
+                    <VBox>
+                        <Label text="Source translation">
+                            <style>-fx-font-size: 14; -fx-fill: #565656;</style>
+                        </Label>
+                        <Label text="No file selected" fx:id="sourceTranslationText">
+                            <style>-fx-font-size: 12; -fx-fill: #565656;</style>
+                        </Label>
+                        <HBox>
+                            <TextField fx:id="sourceTranslationField"/>
+                            <Button text="..." fx:id="sourceTranslationBrowse">
+                                <style>-fx-font-size: 17; -fx-padding: -1 6 0 6;</style>
+                            </Button>
+                        </HBox>
+                    </VBox>
 
-                <VBox>
-                    <Label text="Target translation">
-                        <style>-fx-font-size: 14; -fx-fill: #565656;</style>
-                    </Label>
-                    <Label text="No file selected" fx:id="targetTranslationText">
-                        <style>-fx-font-size: 12; -fx-fill: #565656;</style>
-                    </Label>
-                    <HBox>
-                        <TextField fx:id="targetTranslationField"/>
-                        <Button text="..." fx:id="targetTranslationBrowse">
-                            <style>-fx-font-size: 17; -fx-padding: -1 6 0 6;</style>
-                        </Button>
-                    </HBox>
-                </VBox>
+                    <VBox>
+                        <Label text="Alternative translation">
+                            <style>-fx-font-size: 14; -fx-fill: #565656;</style>
+                        </Label>
+                        <Label text="No file selected" fx:id="alternativeTranslationText">
+                            <style>-fx-font-size: 12; -fx-fill: #565656;</style>
+                        </Label>
+                        <HBox>
+                            <TextField fx:id="alternativeTranslationField"/>
+                            <Button text="..." fx:id="alternativeTranslationBrowse">
+                                <style>-fx-font-size: 17; -fx-padding: -1 6 0 6;</style>
+                            </Button>
+                        </HBox>
+                    </VBox>
 
+                    <VBox>
+                        <Label text="Target translation">
+                            <style>-fx-font-size: 14; -fx-fill: #565656;</style>
+                        </Label>
+                        <Label text="No file selected" fx:id="targetTranslationText">
+                            <style>-fx-font-size: 12; -fx-fill: #565656;</style>
+                        </Label>
+                        <HBox>
+                            <TextField fx:id="targetTranslationField"/>
+                            <Button text="..." fx:id="targetTranslationBrowse">
+                                <style>-fx-font-size: 17; -fx-padding: -1 6 0 6;</style>
+                            </Button>
+                        </HBox>
+                    </VBox>
+                </HBox>
             </HBox>
 
         </VBox>
@@ -104,41 +109,32 @@
 
 
     <bottom>
-        <HBox fx:id="bottomBar">
+        <HBox fx:id="bottomBar" spacing="20">
             <style>-fx-font-size: 12;</style>
 
-            <ComboBox fx:id="sortMode">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Uncompleted first" />
-                        <String fx:value="Sort by key" />
-                    </FXCollections>
-                </items>
-                <value><String fx:value="Sort : uncompleted first" /></value>
-                <style>-fx-max-height: 15px; -fx-padding: 0 1 1 1px; -fx-font-size: 12px;</style>
-            </ComboBox>
-            <ComboBox fx:id="compactMode">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Normal" />
-                        <String fx:value="Compact" />
-                        <String fx:value="One line" />
-                    </FXCollections>
-                </items>
-                <value><String fx:value="Normal" /></value>
-                <style>-fx-max-height: 15px; -fx-padding: 0 1 1 1px; -fx-font-size: 12px;</style>
-            </ComboBox>
+            <ToggleSwitch fx:id="sideEditPane" text="Edit pane on side">
+                <HBox.margin><Insets bottom="2" top="3"/></HBox.margin>
+            </ToggleSwitch>
+            <ToggleSwitch fx:id="wrapText" text="Show all text">
+                <HBox.margin><Insets bottom="2" top="3"/></HBox.margin>
+            </ToggleSwitch>
+            <ToggleSwitch fx:id="compactMode" text="Compact mode">
+                <HBox.margin><Insets bottom="2" top="3" left="5"/></HBox.margin>
+            </ToggleSwitch>
+            <ToggleSwitch fx:id="darkMode" text="Dark mode">
+                <HBox.margin><Insets bottom="2" top="3"/></HBox.margin>
+            </ToggleSwitch>
 
             <Region HBox.hgrow="ALWAYS" />
 
             <Label fx:id="targetStatus">
-                <HBox.margin><Insets bottom="4" top="4" left="20" right="20"/></HBox.margin>
+                <HBox.margin><Insets bottom="4" top="4"/></HBox.margin>
             </Label>
             <Label fx:id="sourceStatus">
-                <HBox.margin><Insets bottom="4" top="4" left="20" right="20"/></HBox.margin>
+                <HBox.margin><Insets bottom="4" top="4"/></HBox.margin>
             </Label>
             <Label fx:id="alternativeStatus">
-                <HBox.margin><Insets bottom="4" top="4" left="20" right="20"/></HBox.margin>
+                <HBox.margin><Insets bottom="4" top="4"/></HBox.margin>
             </Label>
         </HBox>
     </bottom>

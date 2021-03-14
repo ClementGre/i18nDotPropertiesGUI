@@ -1,5 +1,7 @@
-package fr.clementgre.i18nDotPropertiesGUI;
+package fr.clementgre.i18nDotPropertiesGUI.saving;
 
+import fr.clementgre.i18nDotPropertiesGUI.MainWindowController;
+import fr.clementgre.i18nDotPropertiesGUI.Translation;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

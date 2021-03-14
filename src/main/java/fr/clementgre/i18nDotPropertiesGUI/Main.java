@@ -1,6 +1,7 @@
 package fr.clementgre.i18nDotPropertiesGUI;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 public class Main extends Application {
 
+    public static Parent root;
 
     public static void main(String[] args){
         System.out.println("Starting i18nDotPropertiesGUI...");
@@ -23,18 +25,27 @@ public class Main extends Application {
     @Override
     public void start(Stage window) throws IOException {
 
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/mainWindow.fxml"));
-        new JMetro(root, Style.LIGHT);
+
+        root = FXMLLoader.load(getClass().getResource("/fxml/mainWindow.fxml"));
+        new JMetro(root, MainWindowController.prefs.getBoolean("displayModes.darkMode", true) ? Style.DARK : Style.LIGHT);
         root.getStyleClass().add(JMetroStyleClass.BACKGROUND);
 
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root, MainWindowController.prefs.getDouble("windowSize.width", 1200), MainWindowController.prefs.getDouble("windowSize.height", 700));
 
         window.setMinHeight(400);
         window.setMinWidth(700);
+        window.setMaximized(MainWindowController.prefs.getBoolean("windowSize.fullScreen", false));
 
         window.setTitle("i18nDotPropertiesGUI");
         window.setScene(scene);
         window.show();
+
+
+        window.setOnCloseRequest((e) -> {
+            MainWindowController.prefs.putDouble("windowSize.width", scene.getWidth());
+            MainWindowController.prefs.putDouble("windowSize.height", scene.getHeight());
+            MainWindowController.prefs.putBoolean("windowSize.fullScreen", window.isMaximized());
+        });
 
     }
 

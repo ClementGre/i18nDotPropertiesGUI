@@ -1,14 +1,13 @@
-package fr.clementgre.i18nDotPropertiesGUI;
+package fr.clementgre.i18nDotPropertiesGUI.saving;
 
+import fr.clementgre.i18nDotPropertiesGUI.Translation;
 import fr.clementgre.i18nDotPropertiesGUI.utils.DialogBuilder;
 import fr.clementgre.i18nDotPropertiesGUI.utils.StringUtils;
 import javafx.application.Platform;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 

@@ -1,8 +1,5 @@
 package fr.clementgre.i18nDotPropertiesGUI;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Translation implements Comparable<Translation>{
 
     private String comments;

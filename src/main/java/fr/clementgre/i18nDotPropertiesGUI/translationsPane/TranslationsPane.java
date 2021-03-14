@@ -10,10 +10,10 @@ import java.util.Map;
 
 public class TranslationsPane extends MasterDetailPane {
 
-    private TranslationsList masterNode;
-    private TranslationsDetails detailsNode;
+    private final TranslationsList masterNode;
+    private final TranslationsDetails detailsNode;
 
-    private MainWindowController mainWindow;
+    private final MainWindowController mainWindow;
     public TranslationsPane(MainWindowController mainWindow){
         this.mainWindow = mainWindow;
         prefHeightProperty().bind(mainWindow.contentPane.heightProperty());
@@ -22,19 +22,33 @@ public class TranslationsPane extends MasterDetailPane {
         detailsNode = new TranslationsDetails(mainWindow);
         setMasterNode(masterNode);
         setDetailNode(detailsNode);
-        setDetailSide(Side.BOTTOM);
+
+        setDetailSide(MainWindowController.prefs.getBoolean("displayModes.sideEditPane", false) ? Side.RIGHT : Side.BOTTOM);
+
         setShowDetailNode(true);
 
         masterNode.selectedProperty().addListener((observable, oldValue, newValue) -> {
             detailsNode.updateSelected(newValue);
         });
 
+        dividerPositionProperty().addListener((observable, oldValue, newValue) -> {
+            MainWindowController.prefs.putDouble("displayModes.editPaneDivider", newValue.doubleValue());
+        });
+        setDividerPosition(MainWindowController.prefs.getDouble("displayModes.editPaneDivider", .6));
+
+    }
+
+    public void updateDarkMode(){
+        detailsNode.updateDarkTheme();
     }
 
     // SHORTCUTS TO MASTER NODE
 
     public void loadItems(HashMap<String, Translation> source, HashMap<String, Translation> target, HashMap<String, Translation> alternate){
         masterNode.loadItems(source, target, alternate);
+    }
+    public void reloadList(){
+        masterNode.refresh();
     }
     public Map<String, Translation> getSourceTranslations(){
         return masterNode.getSourceTranslations();
@@ -45,17 +59,14 @@ public class TranslationsPane extends MasterDetailPane {
     public Map<String, Translation> getTargetTranslations(){
         return masterNode.getTargetTranslations();
     }
-    public void scrollTo(String key){
-        masterNode.scrollTo(key);
-    }
-    public void scrollTo(Translation tr){
+    public void scrollTo(FullTranslation tr){
         masterNode.scrollTo(tr);
     }
-    public void select(String key){
-        masterNode.select(key);
-    }
-    public void select(Translation tr){
+    public void select(FullTranslation tr){
         masterNode.select(tr);
+    }
+    public void selectNext(){
+        masterNode.selectNext();
     }
     public FullTranslation getSelected(){
         return masterNode.getSelected();

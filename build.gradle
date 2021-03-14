@@ -12,7 +12,7 @@ repositories{
 dependencies{
 
     // JAVA FX //
-    compile (group: 'org.jfxtras', name: 'jmetro', version: '11.6.14'){
+    implementation (group: 'org.jfxtras', name: 'jmetro', version: '11.6.14'){
         exclude group: 'org.openjfx'
     }
 
@@ -21,12 +21,12 @@ dependencies{
 }
 javafx {
     version = '15'
-    modules = ['javafx.controls', 'javafx.swing', 'javafx.fxml']
+    modules = ['javafx.controls', 'javafx.graphics', 'javafx.swing', 'javafx.fxml']
 }
 
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
-mainClassName = "fr.clementgre.i18nDotPropertiesGUI.Main"
+mainClassName = "i18nDotPropertiesGUI/fr.clementgre.i18nDotPropertiesGUI.Main"
 
 version = "1.0"
 description = ""
@@ -49,6 +49,13 @@ task packageRpm(type: Exec){
 }
 sourceCompatibility = 14
 targetCompatibility = 14
+
+run{
+    jvmArgs = [
+            '--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls',
+            '--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls'
+    ]
+}
 
 jlink {
     options = [

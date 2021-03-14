@@ -44,8 +44,8 @@ public class TranslationsPane extends MasterDetailPane {
 
     // SHORTCUTS TO MASTER NODE
 
-    public void loadItems(HashMap<String, Translation> source, HashMap<String, Translation> target, HashMap<String, Translation> alternate){
-        masterNode.loadItems(source, target, alternate);
+    public void loadItems(HashMap<String, Translation> source, HashMap<String, Translation> alternate, HashMap<String, Translation> target){
+        masterNode.loadItems(source, alternate, target);
     }
     public void reloadList(){
         masterNode.refresh();

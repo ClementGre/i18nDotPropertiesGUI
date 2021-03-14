@@ -10,6 +10,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.MenuItem?>
 <?import org.controlsfx.control.ToggleSwitch?>
+<?import org.controlsfx.control.NotificationPane?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.clementgre.i18nDotPropertiesGUI.MainWindowController">
@@ -109,20 +110,20 @@
 
 
     <bottom>
-        <HBox fx:id="bottomBar" spacing="20">
+        <HBox fx:id="bottomBar">
             <style>-fx-font-size: 12;</style>
 
             <ToggleSwitch fx:id="sideEditPane" text="Edit pane on side">
-                <HBox.margin><Insets bottom="2" top="3"/></HBox.margin>
+                <HBox.margin><Insets bottom="2" top="3" left="10" right="10"/></HBox.margin>
             </ToggleSwitch>
             <ToggleSwitch fx:id="wrapText" text="Show all text">
-                <HBox.margin><Insets bottom="2" top="3"/></HBox.margin>
+                <HBox.margin><Insets bottom="2" top="3" left="10" right="10"/></HBox.margin>
             </ToggleSwitch>
             <ToggleSwitch fx:id="compactMode" text="Compact mode">
-                <HBox.margin><Insets bottom="2" top="3" left="5"/></HBox.margin>
+                <HBox.margin><Insets bottom="2" top="3" left="10" right="10"/></HBox.margin>
             </ToggleSwitch>
             <ToggleSwitch fx:id="darkMode" text="Dark mode">
-                <HBox.margin><Insets bottom="2" top="3"/></HBox.margin>
+                <HBox.margin><Insets bottom="2" top="3" left="10" right="10"/></HBox.margin>
             </ToggleSwitch>
 
             <Region HBox.hgrow="ALWAYS" />

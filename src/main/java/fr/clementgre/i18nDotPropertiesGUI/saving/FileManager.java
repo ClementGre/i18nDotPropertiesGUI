@@ -7,7 +7,9 @@ import javafx.application.Platform;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,7 @@ public class FileManager {
         if(file == null){
             isLoaded = false;
             filePanel.translationsListUpdated();
+            filePanel.updateStatus();
         }else{
             updateTranslations();
         }
@@ -40,28 +43,24 @@ public class FileManager {
         try{
             loadTranslations(file);
             isLoaded = true;
-            filePanel.translationsListUpdated();
-            filePanel.updateStatus();
         }catch(IOException e){
             e.printStackTrace();
             DialogBuilder.showErrorAlert(filePanel.getWindow(), "Unable to load translation file " + file.getAbsolutePath(), e.getMessage(), false);
             isLoaded = false;
-            filePanel.translationsListUpdated();
         }
+        filePanel.translationsListUpdated();
+        filePanel.updateStatus();
     }
 
     private void loadTranslations(File file) throws IOException {
         this.file = file;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 
-        FileInputStream fileInputStream = new FileInputStream(file);
-        InputStreamReader inputStream = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
-        BufferedReader reader = new BufferedReader(inputStream);
+        HashMap<String, String> values = new HashMap<>();
 
         Translation translation = new Translation();
-
-        String line; int i = 0;
+        String line;
         while((line = reader.readLine()) != null){
-
             if(!line.isBlank()){
                 if(line.startsWith("#")){
                     translation.addComment(line.trim());
@@ -71,28 +70,30 @@ public class FileManager {
                 String key = line.split(Pattern.quote("="))[0];
                 String value = StringUtils.removeBeforeNotEscaped(line, "=");
 
-
                 if(key != null){
                     if(!key.isBlank()){
-
-                        key = key.replaceAll(Pattern.quote("\\n"), "\n");
                         value = value.replaceAll(Pattern.quote("\\n"), "\n").trim();
-
-                        translation.setKey(key);
                         translation.setValue(value);
+                        translation.setKey(key);
+
+
+                        if(values.containsKey(value) && filePanel.type == FilePanel.TranslationFileType.SOURCE){
+                            filePanel.getWindow().showNotification("warning", "The value " + value + " exits twice in the source translations file. (key " + values.get(value) + " and " + key + ")", 20);
+                        }
+                        if(translations.containsKey(key) && filePanel.type == FilePanel.TranslationFileType.SOURCE){
+                            filePanel.getWindow().showNotification("warning", "The key " + key + " exits twice in the source translations file. The first occurrence will be overwrite.", 20);
+                        }
+
+                        values.put(value, key);
                         translations.put(key, translation);
                         translation = new Translation();
-                        i++;
                     }
                 }
 
             }
         }
+
         reader.close();
-        inputStream.close();
-        fileInputStream.close();
-
-
     }
 
     public boolean updateTranslationKey(String oldKey, String newKey){
@@ -218,19 +219,17 @@ public class FileManager {
 
     }
 
-    public HashMap<String, Translation> getSourceComments(){
-        return filePanel.getSourceTranslations();
-    }
-
-    public HashMap<String, Translation> getTranslations() {
-        return translations;
-    }
-
-    public Translation getTranslation(String key){
-        return translations.get(key);
-    }
-
     public boolean hasTranslations() {
         return isLoaded;
     }
+    public HashMap<String, Translation> getTranslations() {
+        if(hasTranslations()){
+            return translations;
+        }
+        return new HashMap<>();
+    }
+    private Translation getTranslation(String key){
+        return translations.get(key);
+    }
+    
 }

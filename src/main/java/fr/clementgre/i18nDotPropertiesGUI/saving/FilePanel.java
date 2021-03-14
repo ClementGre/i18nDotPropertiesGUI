@@ -2,11 +2,24 @@ package fr.clementgre.i18nDotPropertiesGUI.saving;
 
 import fr.clementgre.i18nDotPropertiesGUI.MainWindowController;
 import fr.clementgre.i18nDotPropertiesGUI.Translation;
+import fr.clementgre.i18nDotPropertiesGUI.utils.StringUtils;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.JMetroStyleClass;
+import jfxtras.styles.jmetro.Style;
+import org.controlsfx.control.action.Action;
 
 import java.io.File;
 import java.util.HashMap;
@@ -58,18 +71,16 @@ public class FilePanel {
             if(file.exists()){
                 fileName.setText(file.getName());
                 fileManager.updateFile(file);
-                mainWindow.prefs.put("translationFilePath." + type.name().toLowerCase(), file.getAbsolutePath());
+                MainWindowController.prefs.put("translationFilePath." + type.name().toLowerCase(), file.getAbsolutePath());
             }else{
                 fileName.setText("No file selected");
                 fileManager.updateFile(null);
-                mainWindow.prefs.put("translationFilePath." + type.name().toLowerCase(), "");
+                MainWindowController.prefs.put("translationFilePath." + type.name().toLowerCase(), "");
             }
             updateStatus();
         });
 
-        Platform.runLater(() -> {
-            field.setText(mainWindow.prefs.get("translationFilePath." + type.name().toLowerCase(), ""));
-        });
+        Platform.runLater(() -> field.setText(MainWindowController.prefs.get("translationFilePath." + type.name().toLowerCase(), "")));
 
     }
 
@@ -80,18 +91,21 @@ public class FilePanel {
     public void updateStatus(){
         if(fileManager.hasTranslations()){
             status.setText(getStatusText());
+            HBox.setMargin(status, new Insets(4, 10, 4, 10));
         }else{
             status.setText(null);
+            HBox.setMargin(status, new Insets(4, 0, 4, 0));
         }
     }
 
     private String getStatusText(){
-        HashMap<String, Translation> translations = getTranslations();
-        int count = translations.size();
-        int completed = (int) translations.values().stream().filter((t) -> !t.getValue().isBlank()).count();
+
+        int count = getTranslations().size();
+        if(getWindow().sourceTranslation.hasTranslations()) count = getSourceTranslations().size();
+        int completed = (int) getTranslations().values().stream().filter((t) -> !t.getValue().isBlank()).count();
         int percentage = 100 * completed/count;
 
-        return type.name().toLowerCase() + " : " + completed + "/" + count + " (" + percentage + "%)";
+        return StringUtils.upperCaseFirstChar(type.name().toLowerCase()) + " : " + completed + "/" + count + " (" + percentage + "%)";
 
     }
 
@@ -100,7 +114,8 @@ public class FilePanel {
     }
 
     public void translationsListUpdated(){
-        mainWindow.translationsPane.loadItems(getSourceTranslations(), getTargetTranslations(), getAlternativeTranslations());
+
+        mainWindow.translationsPane.loadItems(getSourceTranslations(), getAlternativeTranslations(), getTargetTranslations());
     }
 
     public MainWindowController getWindow(){
@@ -111,9 +126,6 @@ public class FilePanel {
         return type == TranslationFileType.SOURCE;
     }
 
-    public Translation getTranslation(String key){
-        return fileManager.getTranslation(key);
-    }
     public HashMap<String, Translation> getTranslations(){
         return fileManager.getTranslations();
     }

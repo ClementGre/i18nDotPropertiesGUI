@@ -6,7 +6,12 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
@@ -14,6 +19,7 @@ import jfxtras.styles.jmetro.JMetroStyleClass;
 import jfxtras.styles.jmetro.Style;
 import org.controlsfx.control.ToggleSwitch;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.prefs.Preferences;
 
 public class MainWindowController extends Stage {
@@ -28,6 +34,7 @@ public class MainWindowController extends Stage {
 
     //
 
+    public AutoHideNotificationPane notificationPane = new AutoHideNotificationPane();
     public MenuBar menuBar;
     public VBox topBar;
     public VBox contentPane;
@@ -71,6 +78,8 @@ public class MainWindowController extends Stage {
         new JMetro(bottomBar, Style.DARK);
         topBar.getStyleClass().add(JMetroStyleClass.BACKGROUND);
         bottomBar.getStyleClass().add(JMetroStyleClass.BACKGROUND);
+        notificationPane.setShowFromTop(false);
+
 
         Platform.runLater(() -> {
             // Translations loaders
@@ -80,8 +89,9 @@ public class MainWindowController extends Stage {
 
             // content Pane
             translationsPane = new TranslationsPane(this);
-            contentPane.getChildren().add(translationsPane);
+            notificationPane.setContent(translationsPane);
 
+            contentPane.getChildren().add(notificationPane);
         });
 
         // SETTINGS
@@ -121,6 +131,12 @@ public class MainWindowController extends Stage {
             alternativeTranslation.saveTranslations();
             targetTranslation.saveTranslations();
         });
+
+    }
+
+
+    public void showNotification(String type, String text, int autoHide){
+        notificationPane.show(text, type, autoHide);
     }
 
 

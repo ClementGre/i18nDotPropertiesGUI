@@ -66,6 +66,10 @@ public class StringUtils {
         return name;
     }
 
+    public static String upperCaseFirstChar(String str){
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
 
     public static String removeBeforeLastRegex(String string, String rejex){
         if(rejex.isEmpty()) return string;

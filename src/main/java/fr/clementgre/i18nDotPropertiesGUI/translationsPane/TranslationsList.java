@@ -6,7 +6,6 @@ import fr.clementgre.i18nDotPropertiesGUI.Translation;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -30,7 +29,9 @@ public class TranslationsList extends TableView<FullTranslation> {
         getStyleClass().add(JMetroStyleClass.ALTERNATING_ROW_COLORS);
         getStyleClass().add(JMetroStyleClass.TABLE_GRID_LINES);
 
-        getColumns().addAll(keyColumn, sourceColumn, targetColumn);
+        getColumns().add(keyColumn);
+        getColumns().add(sourceColumn);
+        getColumns().add(targetColumn);
 
         keyColumn.setCellValueFactory(param -> param.getValue().keyProperty());
         sourceColumn.setCellValueFactory(param -> param.getValue().sourceTranslationProperty());
@@ -84,9 +85,6 @@ public class TranslationsList extends TableView<FullTranslation> {
             return true;
         });
 
-        getItems().addListener((ListChangeListener<FullTranslation>) c -> {
-            System.out.println("change !");
-        });
     }
 
     private TableCell<FullTranslation, String> getCellFactory(TableColumn<FullTranslation, String> column, boolean allowWrap){
@@ -130,19 +128,24 @@ public class TranslationsList extends TableView<FullTranslation> {
         return getSelectionModel().selectedItemProperty();
     }
 
-    public void loadItems(HashMap<String, Translation> source, HashMap<String, Translation> target, HashMap<String, Translation> alternate){
+    public void loadItems(HashMap<String, Translation> source, HashMap<String, Translation> alternate, HashMap<String, Translation> target){
         if(target.isEmpty() || source.isEmpty()){
-            setItems(null);
-            return;
+            setItems(null); return;
         }
+
         List<FullTranslation> translations = source.values().stream().map((tr) ->
             new FullTranslation(tr.getKey(), tr.getComments(), tr.getValue(),
                     alternate.containsKey(tr.getKey()) ? alternate.get(tr.getKey()).getValue() : "",
                     target.containsKey(tr.getKey()) ? target.get(tr.getKey()).getValue() : "")).collect(Collectors.toList());
-        setItems(FXCollections.observableList(translations));
 
-        getSortOrder().add(sourceColumn);
-        sort();
+        setItems(null);
+        Platform.runLater(() -> {
+            setItems(FXCollections.observableList(translations));
+            getSortOrder().add(sourceColumn);
+            sort();
+        });
+
+
 
     }
     private int getTranslationSourceSortValue(FullTranslation translation){

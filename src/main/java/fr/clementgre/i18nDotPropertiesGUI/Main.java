@@ -2,19 +2,26 @@ package fr.clementgre.i18nDotPropertiesGUI;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.JMetroStyleClass;
 import jfxtras.styles.jmetro.Style;
+import org.controlsfx.control.NotificationPane;
 
 import java.io.IOException;
 
 public class Main extends Application {
 
     public static Parent root;
+
 
     public static void main(String[] args){
         System.out.println("Starting i18nDotPropertiesGUI...");
@@ -24,7 +31,6 @@ public class Main extends Application {
     }
     @Override
     public void start(Stage window) throws IOException {
-
 
         root = FXMLLoader.load(getClass().getResource("/fxml/mainWindow.fxml"));
         new JMetro(root, MainWindowController.prefs.getBoolean("displayModes.darkMode", true) ? Style.DARK : Style.LIGHT);
@@ -46,6 +52,8 @@ public class Main extends Application {
             MainWindowController.prefs.putDouble("windowSize.height", scene.getHeight());
             MainWindowController.prefs.putBoolean("windowSize.fullScreen", window.isMaximized());
         });
+
+        root.getStylesheets().add(Main.class.getResource("/css/main.css").toExternalForm());
 
     }
 

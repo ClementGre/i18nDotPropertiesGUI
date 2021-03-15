@@ -18,10 +18,12 @@ public class TranslationSemiInput extends Pane {
     private final String typeName;
 
     private final boolean lightFont;
+    private boolean importantToBeFilled;
 
-    public TranslationSemiInput(String typeName, boolean bigFont, boolean lightFont){
+    public TranslationSemiInput(String typeName, boolean bigFont, boolean lightFont, boolean importantToBeFilled){
         this.typeName = typeName;
         this.lightFont = lightFont;
+        this.importantToBeFilled = importantToBeFilled;
 
         if(bigFont) input = new TranslationInput(30, 14);
         else input = new TranslationInput();
@@ -57,9 +59,13 @@ public class TranslationSemiInput extends Pane {
     public void updateText(){
         if(input.getValue().isBlank()){
             label.setText("Add " + typeName + "...");
-            if(MainWindowController.prefs.getBoolean("displayModes.darkMode", true)) label.setStyle(labelStyle + " -fx-text-fill: #c0c0c0;");
-            else label.setStyle(labelStyle + " -fx-text-fill: #787878;");
-
+            if(importantToBeFilled){
+                if(MainWindowController.prefs.getBoolean("displayModes.darkMode", true)) label.setStyle(labelStyle + " -fx-text-fill: #ff5353;");
+                else label.setStyle(labelStyle + " -fx-text-fill: #a00000;");
+            }else{
+                if(MainWindowController.prefs.getBoolean("displayModes.darkMode", true)) label.setStyle(labelStyle + " -fx-text-fill: #c0c0c0;");
+                else label.setStyle(labelStyle + " -fx-text-fill: #787878;");
+            }
         }else{
             label.setText(input.getValue());
             if(lightFont){

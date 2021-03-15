@@ -136,7 +136,7 @@ public class MainWindowController extends Stage {
 
 
     public void showNotification(String type, String text, int autoHide){
-        notificationPane.show(text, type, autoHide);
+        notificationPane.addToPending(text, type, autoHide);
     }
 
 

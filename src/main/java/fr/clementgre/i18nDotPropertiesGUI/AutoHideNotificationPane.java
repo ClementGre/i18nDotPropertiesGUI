@@ -12,11 +12,44 @@ import javafx.scene.layout.VBox;
 import jfxtras.styles.jmetro.JMetroStyleClass;
 import org.controlsfx.control.NotificationPane;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AutoHideNotificationPane extends NotificationPane {
 
+    private class Notification{
+        public String text;
+        public String iconName;
+        public int autoHideTime;
+        public Notification(String text, String iconName, int autoHideTime) {
+            this.text = text;
+            this.iconName = iconName;
+            this.autoHideTime = autoHideTime;
+        }
+    }
 
+    ArrayList<Notification> pendingList = new ArrayList<>();
+
+    public AutoHideNotificationPane(){
+
+        final EventHandler<Event> onHideEvent = e -> {
+            checkPending();
+        };
+        addEventHandler(NotificationPane.ON_HIDDEN, onHideEvent);
+
+    }
+
+    public void addToPending(String text, String iconName, int autoHideTime){
+        pendingList.add(new Notification(text, iconName, autoHideTime));
+        checkPending();
+    }
+
+    private void checkPending(){
+        if(pendingList.size() > 0 && !isShowing()){
+            show(pendingList.get(0).text, pendingList.get(0).iconName, pendingList.get(0).autoHideTime);
+            pendingList.remove(0);
+        }
+    }
 
     public void show(String text, String iconName, int autoHideTime){
 
@@ -63,8 +96,7 @@ public class AutoHideNotificationPane extends NotificationPane {
     private void hideAndThen(final Runnable r) {
         if (isShowing()) {
             final EventHandler<Event> eventHandler = new EventHandler<>() {
-                @Override
-                public void handle(Event e) {
+                @Override public void handle(Event e) {
                     r.run();
                     removeEventHandler(NotificationPane.ON_HIDDEN, this);
                 }

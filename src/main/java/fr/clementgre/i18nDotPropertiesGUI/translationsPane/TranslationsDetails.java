@@ -15,9 +15,9 @@ public class TranslationsDetails extends ScrollPane {
     private final VBox content = new VBox();
 
     private final Label keyLabel = new Label();
-    private final TranslationSemiInput sourceSemiInput = new TranslationSemiInput("source translation", true, false);
-    private final TranslationSemiInput alternativeSemiInput = new TranslationSemiInput("alternative translation", false, true);
-    private final TranslationSemiInput commentsSemiInput = new TranslationSemiInput("comments", false, true);
+    private final TranslationSemiInput sourceSemiInput = new TranslationSemiInput("source translation", true, false, true);
+    private final TranslationSemiInput alternativeSemiInput = new TranslationSemiInput("alternative translation", false, true, false);
+    private final TranslationSemiInput commentsSemiInput = new TranslationSemiInput("comments", false, true, false);
     private final TranslationInput targetInput = new TranslationInput(30, 14);
 
     private final MainWindowController mainWindow;
@@ -85,7 +85,9 @@ public class TranslationsDetails extends ScrollPane {
             alternativeSemiInput.setText(translation.getAlternativeTranslation());
             commentsSemiInput.setText(translation.getComments());
             targetInput.setValue(translation.getTargetTranslation());
-            content.getChildren().setAll(keyLabel, sourceSemiInput, alternativeSemiInput, commentsSemiInput, targetInput);
+            if(mainWindow.alternativeTranslation.hasTranslations()){
+                content.getChildren().setAll(keyLabel, sourceSemiInput, alternativeSemiInput, commentsSemiInput, targetInput);
+            }else content.getChildren().setAll(keyLabel, sourceSemiInput, commentsSemiInput, targetInput);
         }else{
             content.getChildren().clear();
         }

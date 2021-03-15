@@ -78,10 +78,10 @@ public class FileManager {
 
 
                         if(values.containsKey(value) && filePanel.type == FilePanel.TranslationFileType.SOURCE){
-                            filePanel.getWindow().showNotification("warning", "The value " + value + " exits twice in the source translations file. (key " + values.get(value) + " and " + key + ")", 20);
+                            filePanel.getWindow().showNotification("warning", "The value \"" + value + "\" exits twice in the source translations file. (key \"" + values.get(value) + "\" and \"" + key + "\")", 20);
                         }
                         if(translations.containsKey(key) && filePanel.type == FilePanel.TranslationFileType.SOURCE){
-                            filePanel.getWindow().showNotification("warning", "The key " + key + " exits twice in the source translations file. The first occurrence will be overwrite.", 20);
+                            filePanel.getWindow().showNotification("warning", "The key \"" + key + "\" exits twice in the source translations file. The first occurrence will be overwrite.", 20);
                         }
 
                         values.put(value, key);

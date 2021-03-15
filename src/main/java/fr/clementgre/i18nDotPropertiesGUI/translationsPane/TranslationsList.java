@@ -54,7 +54,7 @@ public class TranslationsList extends TableView<FullTranslation> {
 
             TableColumn.SortType sortType = TableColumn.SortType.DESCENDING;
             TableColumn<FullTranslation, ?> sortColumn = keyColumn;
-            if(!sortOrder.isEmpty()){
+            if(!sortOrder.isEmpty() && sortOrder.get(0) != null){
                 sortType = sortOrder.get(0).getSortType();
                 sortColumn = sortOrder.get(0);
             }
@@ -128,7 +128,16 @@ public class TranslationsList extends TableView<FullTranslation> {
         return getSelectionModel().selectedItemProperty();
     }
 
+    private TableColumn<FullTranslation, ?> oldSortColumn = sourceColumn;
+    private TableColumn.SortType oldSortType = TableColumn.SortType.ASCENDING;
+    private String oldKey = null;
     public void loadItems(HashMap<String, Translation> source, HashMap<String, Translation> alternate, HashMap<String, Translation> target){
+        if(getItems() != null){
+            if(getSelected() != null) oldKey = getSelected().getKey();
+            oldSortColumn = getSortOrder().isEmpty() ? null : getSortOrder().get(0);
+            oldSortType = getSortOrder().isEmpty() ? null : getSortOrder().get(0).getSortType();
+        }
+
         if(target.isEmpty() || source.isEmpty()){
             setItems(null); return;
         }
@@ -141,8 +150,22 @@ public class TranslationsList extends TableView<FullTranslation> {
         setItems(null);
         Platform.runLater(() -> {
             setItems(FXCollections.observableList(translations));
-            getSortOrder().add(sourceColumn);
+            getSortOrder().clear();
+            if(oldSortColumn != null){
+                if(oldSortType != null) oldSortColumn.setSortType(oldSortType);
+                getSortOrder().add(oldSortColumn);
+            }
+
             sort();
+
+            if(oldKey != null){
+                for(FullTranslation translation : translations){
+                    if(translation.getKey().equals(oldKey)){
+                        Platform.runLater(() -> select(translation));
+                        break;
+                    }
+                }
+            }
         });
 
 

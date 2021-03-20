@@ -12,7 +12,6 @@ This GUI can help you or your translators to improve the way you edit translatio
 All these values (except the key) can be edited directly in the app.
 
 ![preview](https://raw.githubusercontent.com/ClementGre/i18nDotPropertiesGUI/master/images/preview.png)
-
 *Used to manage the translations of [PDF4Teachers](https://github.com/ClementGre/PDF4Teachers).*
 
 # Target translation keyboard shortcuts

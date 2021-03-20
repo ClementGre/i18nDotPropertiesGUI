@@ -10,7 +10,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.MenuItem?>
 <?import org.controlsfx.control.ToggleSwitch?>
-<?import org.controlsfx.control.NotificationPane?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="fr.clementgre.i18nDotPropertiesGUI.MainWindowController">
@@ -28,6 +27,7 @@
                                 <MenuItem fx:id="menuReload" text="Reload from disk" mnemonicParsing="false" accelerator="Shortcut+R"/>
                                 <MenuItem fx:id="menuSave" text="Force save" mnemonicParsing="false" accelerator="Shortcut+S"/>
                                 <MenuItem fx:id="menuFind" text="Find" mnemonicParsing="false" accelerator="Shortcut+F"/>
+                                <MenuItem fx:id="menuAbout" text="About..."/>
                             </Menu>
                         </MenuBar>
 

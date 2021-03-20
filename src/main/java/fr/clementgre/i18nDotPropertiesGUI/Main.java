@@ -1,6 +1,7 @@
 package fr.clementgre.i18nDotPropertiesGUI;
 
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -8,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -24,6 +26,7 @@ public class Main extends Application {
     public static Stage window;
     public static Scene scene;
 
+    public static HostServices hostServices;
 
     public static void main(String[] args){
         System.out.println("Starting i18nDotPropertiesGUI...");
@@ -34,6 +37,7 @@ public class Main extends Application {
     @Override
     public void start(Stage window) throws IOException {
         Main.window = window;
+        Main.hostServices = getHostServices();
 
         root = FXMLLoader.load(getClass().getResource("/fxml/mainWindow.fxml"));
         new JMetro(root, MainWindowController.prefs.getBoolean("displayModes.darkMode", true) ? Style.DARK : Style.LIGHT);
@@ -46,6 +50,7 @@ public class Main extends Application {
         window.setMaximized(MainWindowController.prefs.getBoolean("windowSize.fullScreen", false));
 
         window.setTitle("i18nDotPropertiesGUI");
+        window.getIcons().addAll(new Image(getClass().getResourceAsStream("/icon.png")), new Image(getClass().getResourceAsStream("/icon-32.png")));
         window.setScene(scene);
         window.show();
 

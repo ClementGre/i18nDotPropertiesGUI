@@ -40,6 +40,7 @@ public class MainWindowController extends Stage {
     public MenuItem menuReload;
     public MenuItem menuSave;
     public MenuItem menuFind;
+    public MenuItem menuAbout;
 
     //
 
@@ -66,7 +67,6 @@ public class MainWindowController extends Stage {
     public Label targetStatus;
     public Label sourceStatus;
     public Label alternativeStatus;
-
 
     @FXML
     public void initialize(){
@@ -147,6 +147,9 @@ public class MainWindowController extends Stage {
                     translationsPane.search(input.getText());
                 }
             });
+        });
+        menuAbout.setOnAction((e) -> {
+            Main.hostServices.showDocument("https://github.com/ClementGre/i18nDotPropertiesGUI");
         });
 
     }

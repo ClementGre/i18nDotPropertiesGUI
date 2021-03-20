@@ -109,13 +109,13 @@ public class FilePanel {
 
     }
 
-    public void saveTranslations(){
-        fileManager.saveTranslations();
+    public void translationsListUpdated(){
+        mainWindow.translationsPane.loadItems(getSourceTranslations(), getAlternativeTranslations(), getTargetTranslations());
     }
 
-    public void translationsListUpdated(){
-
-        mainWindow.translationsPane.loadItems(getSourceTranslations(), getAlternativeTranslations(), getTargetTranslations());
+    public void save(){
+        fileManager.updateTranslationsFromUserEdits();
+        fileManager.saveTranslations();
     }
 
     public MainWindowController getWindow(){

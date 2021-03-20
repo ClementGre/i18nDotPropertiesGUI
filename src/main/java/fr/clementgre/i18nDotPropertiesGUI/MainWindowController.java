@@ -6,20 +6,15 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.JMetroStyleClass;
 import jfxtras.styles.jmetro.Style;
 import org.controlsfx.control.ToggleSwitch;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.prefs.Preferences;
 
 public class MainWindowController extends Stage {
@@ -44,6 +39,7 @@ public class MainWindowController extends Stage {
 
     public MenuItem menuReload;
     public MenuItem menuSave;
+    public MenuItem menuFind;
 
     //
 
@@ -71,6 +67,7 @@ public class MainWindowController extends Stage {
     public Label sourceStatus;
     public Label alternativeStatus;
 
+
     @FXML
     public void initialize(){
 
@@ -80,6 +77,13 @@ public class MainWindowController extends Stage {
         bottomBar.getStyleClass().add(JMetroStyleClass.BACKGROUND);
         notificationPane.setShowFromTop(false);
 
+        Main.window.setOnCloseRequest((e) -> {
+            save();
+            MainWindowController.prefs.putDouble("windowSize.width", Main.scene.getWidth());
+            MainWindowController.prefs.putDouble("windowSize.height", Main.scene.getHeight());
+            MainWindowController.prefs.putBoolean("windowSize.fullScreen", Main.window.isMaximized());
+
+        });
 
         Platform.runLater(() -> {
             // Translations loaders
@@ -127,16 +131,47 @@ public class MainWindowController extends Stage {
             targetTranslation.reloadFromDisk();
         });
         menuSave.setOnAction((e) -> {
-            sourceTranslation.saveTranslations();
-            alternativeTranslation.saveTranslations();
-            targetTranslation.saveTranslations();
+            save();
+            showNotificationNow("information", "Saved !", 5);
+        });
+        menuFind.setOnAction((e) -> {
+            TextField input = new TextField();
+            notificationPane.showNow("Find :", "confirm", input);
+            input.textProperty().addListener((observable, oldValue, newValue) -> translationsPane.search(newValue));
+            input.addEventFilter(KeyEvent.KEY_PRESSED, e1 -> {
+                if(e1.getCode() == KeyCode.ESCAPE){
+                    notificationPane.hide();
+                    translationsPane.search(null);
+                }else if(e1.getCode() == KeyCode.ENTER){
+                    notificationPane.hide();
+                    translationsPane.search(input.getText());
+                }
+            });
         });
 
+    }
+
+    private long lastSaveTime = System.currentTimeMillis();
+    public void autoSave(){
+        if(System.currentTimeMillis() - lastSaveTime >= 60000){ // 10s
+            save();
+        }
+    }
+    public void save(){
+        System.out.println("Saving...");
+        lastSaveTime = System.currentTimeMillis();
+        translationsPane.updateUnsavedData();
+        sourceTranslation.save();
+        alternativeTranslation.save();
+        targetTranslation.save();
     }
 
 
     public void showNotification(String type, String text, int autoHide){
         notificationPane.addToPending(text, type, autoHide);
+    }
+    public void showNotificationNow(String type, String text, int autoHide){
+        notificationPane.showNow(text, type, autoHide);
     }
 
 

@@ -27,6 +27,7 @@
                                 <style>-fx-padding: 6 15;</style>
                                 <MenuItem fx:id="menuReload" text="Reload from disk" mnemonicParsing="false" accelerator="Shortcut+R"/>
                                 <MenuItem fx:id="menuSave" text="Force save" mnemonicParsing="false" accelerator="Shortcut+S"/>
+                                <MenuItem fx:id="menuFind" text="Find" mnemonicParsing="false" accelerator="Shortcut+F"/>
                             </Menu>
                         </MenuBar>
 

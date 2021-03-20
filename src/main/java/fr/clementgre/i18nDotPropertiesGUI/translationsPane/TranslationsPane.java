@@ -42,8 +42,14 @@ public class TranslationsPane extends MasterDetailPane {
         detailsNode.updateDarkTheme();
     }
 
-    // SHORTCUTS TO MASTER NODE
+    public void updateUnsavedData(){
+        detailsNode.saveValues();
+    }
 
+    // SHORTCUTS TO MASTER NODE
+    public void search(String text){
+        masterNode.search(text);
+    }
     public void loadItems(HashMap<String, Translation> source, HashMap<String, Translation> alternate, HashMap<String, Translation> target){
         masterNode.loadItems(source, alternate, target);
     }

@@ -21,6 +21,8 @@ import java.io.IOException;
 public class Main extends Application {
 
     public static Parent root;
+    public static Stage window;
+    public static Scene scene;
 
 
     public static void main(String[] args){
@@ -31,12 +33,13 @@ public class Main extends Application {
     }
     @Override
     public void start(Stage window) throws IOException {
+        Main.window = window;
 
         root = FXMLLoader.load(getClass().getResource("/fxml/mainWindow.fxml"));
         new JMetro(root, MainWindowController.prefs.getBoolean("displayModes.darkMode", true) ? Style.DARK : Style.LIGHT);
         root.getStyleClass().add(JMetroStyleClass.BACKGROUND);
 
-        Scene scene = new Scene(root, MainWindowController.prefs.getDouble("windowSize.width", 1200), MainWindowController.prefs.getDouble("windowSize.height", 700));
+        scene = new Scene(root, MainWindowController.prefs.getDouble("windowSize.width", 1200), MainWindowController.prefs.getDouble("windowSize.height", 700));
 
         window.setMinHeight(400);
         window.setMinWidth(700);
@@ -45,13 +48,6 @@ public class Main extends Application {
         window.setTitle("i18nDotPropertiesGUI");
         window.setScene(scene);
         window.show();
-
-
-        window.setOnCloseRequest((e) -> {
-            MainWindowController.prefs.putDouble("windowSize.width", scene.getWidth());
-            MainWindowController.prefs.putDouble("windowSize.height", scene.getHeight());
-            MainWindowController.prefs.putBoolean("windowSize.fullScreen", window.isMaximized());
-        });
 
         root.getStylesheets().add(Main.class.getResource("/css/main.css").toExternalForm());
 

@@ -2,10 +2,13 @@ package fr.clementgre.i18nDotPropertiesGUI.translationsPane;
 
 import fr.clementgre.i18nDotPropertiesGUI.FullTranslation;
 import fr.clementgre.i18nDotPropertiesGUI.MainWindowController;
+import fr.clementgre.i18nDotPropertiesGUI.utils.StringUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
 public class TranslationsDetails extends ScrollPane {
@@ -59,9 +62,18 @@ public class TranslationsDetails extends ScrollPane {
         targetInput.setNextEvent(() -> {
             mainWindow.translationsPane.selectNext();
         });
+        targetInput.addEventFilter(KeyEvent.KEY_PRESSED, (e) -> {
+            if(e.getCode() == KeyCode.SPACE && e.isShortcutDown()){
+                e.consume();
+                addArg();
+            }else if(e.getCode() == KeyCode.C && e.isShortcutDown() && e.isShiftDown()){
+                e.consume();
+                copySource();
+            }
+        });
 
         sourceSemiInput.setUpdateTextEvent((text) -> {
-            if(translation != null) translation.setSourceTranslation(text);
+            if (translation != null) translation.setSourceTranslation(text);
         });
         alternativeSemiInput.setUpdateTextEvent((text) -> {
             if(translation != null) translation.setAlternativeTranslation(text);
@@ -76,6 +88,29 @@ public class TranslationsDetails extends ScrollPane {
         setContent(content);
         setHbarPolicy(ScrollBarPolicy.NEVER);
 
+    }
+
+    private void addArg(){
+        String text = targetInput.getText();
+        int i = 0;
+        while(text.contains("{" + i + "}")) i++;
+        if(sourceSemiInput.getText().contains("{" + i + "}")){
+            targetInput.setText(text + "{" + i + "}");
+            targetInput.end();
+        }
+    }
+    private void copySource(){
+        String text = targetInput.getText();
+        int i = 0;
+        while(text.contains("{" + i + "}")) i++;
+
+
+        if(i != 0){
+            targetInput.setText(text + StringUtils.removeBeforeLastRegex(sourceSemiInput.getText(), "{" + (i-1) + "}"));
+        }else{
+            targetInput.setText(text + sourceSemiInput.getText());
+        }
+        targetInput.end();
     }
 
     private void updateGraphics(){
@@ -93,7 +128,7 @@ public class TranslationsDetails extends ScrollPane {
         }
     }
 
-    private void saveValues(){
+    void saveValues(){
         if(sourceSemiInput.hasUnsavedValue()) translation.setSourceTranslation(sourceSemiInput.getText());
         if(alternativeSemiInput.hasUnsavedValue()) translation.setAlternativeTranslation(alternativeSemiInput.getText());
         if(commentsSemiInput.hasUnsavedValue()) translation.setComments(commentsSemiInput.getText());

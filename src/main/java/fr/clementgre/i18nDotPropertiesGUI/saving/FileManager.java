@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,23 @@ public class FileManager {
         filePanel.updateStatus();
     }
 
+    public void updateTranslationsFromUserEdits() {
+        if(!isLoaded) return;
+
+        if(filePanel.type == FilePanel.TranslationFileType.SOURCE){
+            Map<String, Translation> trs = filePanel.getWindow().translationsPane.getSourceTranslations();
+            if(!trs.isEmpty()) translations = new HashMap<>(trs);
+
+        }else if(filePanel.type == FilePanel.TranslationFileType.ALTERNATIVE){
+            Map<String, Translation> trs = filePanel.getWindow().translationsPane.getAlternativeTranslations();
+            if(!trs.isEmpty()) translations = new HashMap<>(trs);
+
+        }else if(filePanel.type == FilePanel.TranslationFileType.TARGET){
+            Map<String, Translation> trs = filePanel.getWindow().translationsPane.getTargetTranslations();
+            if(!trs.isEmpty()) translations = new HashMap<>(trs);
+        }
+    }
+
     private void loadTranslations(File file) throws IOException {
         this.file = file;
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
@@ -84,7 +102,7 @@ public class FileManager {
                             filePanel.getWindow().showNotification("warning", "The key \"" + key + "\" exits twice in the source translations file. The first occurrence will be overwrite.", 20);
                         }
 
-                        values.put(value, key);
+                        if(!value.isBlank()) values.put(value, key);
                         translations.put(key, translation);
                         translation = new Translation();
                     }
@@ -94,87 +112,6 @@ public class FileManager {
         }
 
         reader.close();
-    }
-
-    public boolean updateTranslationKey(String oldKey, String newKey){
-        newKey = newKey.replaceAll("\\s+","");
-        if(!isLoaded || oldKey.equals(newKey)) return false;
-
-        if(!translations.containsKey(oldKey)){
-            if(!filePanel.isSource()) return false;
-            System.err.println("Key " + oldKey + " does not exists in " + filePanel.type.name() + " (updateTranslationKey)");
-            return false;
-        }
-
-        translations.get(oldKey).setKey(newKey);
-        translations.put(newKey, translations.get(oldKey));
-        translations.remove(oldKey);
-
-        saveTranslations();
-
-        if(filePanel.isSource()){
-            filePanel.getWindow().alternativeTranslation.fileManager.updateTranslationKey(oldKey, newKey);
-            filePanel.getWindow().targetTranslation.fileManager.updateTranslationKey(oldKey, newKey);
-            Platform.runLater(() -> filePanel.translationsListUpdated());
-        }
-        return true;
-    }
-    public boolean updateTranslationValue(String key, String newValue){
-        if(!isLoaded) return false;
-        if(!translations.containsKey(key)){
-            translations.put(key, new Translation(null, key, newValue));
-        }else{
-            if(translations.get(key).getValue().equals(newValue)) return false;
-            translations.get(key).setValue(newValue);
-        }
-        saveTranslations();
-        return true;
-    }
-    public boolean updateTranslationComment(String key, String newComments){
-        if(!isLoaded) return false;
-        if(!translations.containsKey(key)){
-            System.err.println("Key " + key + " does not exists in " + filePanel.type.name() + " (updateTranslationValue)");
-            return false;
-        }
-        if(!filePanel.isSource()) System.err.println("updateTranslationComment method must be called on sourceTranslation only");
-
-        translations.get(key).setComments(newComments);
-        saveTranslations();
-
-        filePanel.getWindow().alternativeTranslation.saveTranslations();
-        filePanel.getWindow().targetTranslation.saveTranslations();
-        return true;
-    }
-
-    public String addTranslation() {
-        String key = "";
-        int i = 0;
-        while(i == 0 || getTranslation(key) != null){ // check translation do not already exists
-            i++;
-            key = "unknown." + i;
-        }
-
-        translations.put(key, new Translation(null, key, ""));
-        saveTranslations();
-        filePanel.translationsListUpdated();
-        return key;
-
-    }
-    public void deleteTranslation(String key) {
-        if(!isLoaded) return;
-
-        if(translations.containsKey(key)){
-            translations.remove(key);
-
-            saveTranslations();
-
-            if(filePanel.isSource()){
-                filePanel.getWindow().alternativeTranslation.fileManager.deleteTranslation(key);
-                filePanel.getWindow().targetTranslation.fileManager.deleteTranslation(key);
-                Platform.runLater(() -> filePanel.translationsListUpdated());
-            }
-        }
-
     }
 
     public void saveTranslations() {

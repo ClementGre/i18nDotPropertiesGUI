@@ -3,8 +3,11 @@ package fr.clementgre.i18nDotPropertiesGUI.translationsPane;
 import fr.clementgre.i18nDotPropertiesGUI.FullTranslation;
 import fr.clementgre.i18nDotPropertiesGUI.MainWindowController;
 import fr.clementgre.i18nDotPropertiesGUI.Translation;
+import fr.clementgre.i18nDotPropertiesGUI.utils.StringUtils;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableCell;
@@ -45,6 +48,7 @@ public class TranslationsList extends TableView<FullTranslation> {
         targetColumn.setCellFactory(column -> getCellFactory(column, true));
 
         setEditable(true);
+        getSortOrder().add(sourceColumn);
 
         sortPolicyProperty().set(param -> {
 
@@ -52,8 +56,8 @@ public class TranslationsList extends TableView<FullTranslation> {
             final ObservableList<FullTranslation> itemsList = getItems();
             if(itemsList == null || itemsList.isEmpty()) return true;
 
-            TableColumn.SortType sortType = TableColumn.SortType.DESCENDING;
-            TableColumn<FullTranslation, ?> sortColumn = keyColumn;
+            TableColumn.SortType sortType = TableColumn.SortType.ASCENDING;
+            TableColumn<FullTranslation, ?> sortColumn = null;
             if(!sortOrder.isEmpty() && sortOrder.get(0) != null){
                 sortType = sortOrder.get(0).getSortType();
                 sortColumn = sortOrder.get(0);
@@ -62,14 +66,18 @@ public class TranslationsList extends TableView<FullTranslation> {
             final TableColumn.SortType finalSortType = sortType;
             final Comparator<FullTranslation> tableComparator = getComparator();
             TableColumn<FullTranslation, ?> finalSortColumn = sortColumn;
-            Comparator<FullTranslation> comparator = tableComparator == null ? null : (o1, o2) -> {
-
-                if(finalSortColumn.equals(sourceColumn)){
+            Comparator<FullTranslation> comparator = (o1, o2) -> {
+                if(tableComparator == null && searchText != null){
+                    int v1 = getTranslationSearchSortValue(o1);
+                    int v2 = getTranslationSearchSortValue(o2);
+                    if(v1 != v2) return v1 - v2;
+                    else return o1.getKey().compareTo(o2.getKey());
+                }else if(sourceColumn.equals(finalSortColumn)){
                     int v1 = getTranslationSourceSortValue(o1);
                     int v2 = getTranslationSourceSortValue(o2);
                     if(v1 != v2) return finalSortType == TableColumn.SortType.ASCENDING ? v1 - v2 : v2 - v1;
                     else return o1.getKey().compareTo(o2.getKey());
-                }else if(finalSortColumn.equals(targetColumn)){
+                }else if(targetColumn.equals(finalSortColumn)){
                     int v1 = getTranslationTargetSortValue(o1);
                     int v2 = getTranslationTargetSortValue(o2);
                     if(v1 != v2) return finalSortType == TableColumn.SortType.ASCENDING ? v1 - v2 : v2 - v1;
@@ -78,13 +86,37 @@ public class TranslationsList extends TableView<FullTranslation> {
                     int output = o1.getKey().compareTo(o2.getKey());
                     return finalSortType == TableColumn.SortType.ASCENDING ? output : -output;
                 }
-
-
             };
             setItems(getItems().sorted(comparator));
             return true;
         });
 
+        getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            getWindow().autoSave();
+        });
+
+    }
+
+    private String searchText = null;
+    private TableColumn<FullTranslation, ?> oldSearchSortColumn = getSortOrder().isEmpty() ? null : getSortOrder().get(0);
+    private TableColumn.SortType oldSearchSortType = getSortOrder().isEmpty() ? null : getSortOrder().get(0).getSortType();
+
+    public void search(String text){
+        if(text == null || text.isEmpty()){
+            searchText = null;
+            if(oldSearchSortColumn != null){
+                if(oldSearchSortType != null) oldSearchSortColumn.setSortType(oldSearchSortType);
+                getSortOrder().add(oldSearchSortColumn);
+            }
+        }else{
+            if(searchText == null){
+                oldSearchSortColumn = getSortOrder().isEmpty() ? null : getSortOrder().get(0);
+                oldSearchSortType = getSortOrder().isEmpty() ? null : getSortOrder().get(0).getSortType();
+            }
+            searchText = text;
+            getSortOrder().clear();
+        }
+        sort();
     }
 
     private TableCell<FullTranslation, String> getCellFactory(TableColumn<FullTranslation, String> column, boolean allowWrap){
@@ -167,10 +199,8 @@ public class TranslationsList extends TableView<FullTranslation> {
                 }
             }
         });
-
-
-
     }
+
     private int getTranslationSourceSortValue(FullTranslation translation){
         int output = 0;
         output += translation.getSourceTranslation().isBlank() ? 0 : 10;
@@ -183,6 +213,13 @@ public class TranslationsList extends TableView<FullTranslation> {
         output += translation.getSourceTranslation().isBlank() ? 0 : 5;
         output += translation.getTargetTranslation().isBlank() ? 0 : 10;
         output += translation.getAlternativeTranslation().isBlank() ? 0 : 1;
+        return output;
+    }
+    private int getTranslationSearchSortValue(FullTranslation translation){
+        int output = 0;
+        output += StringUtils.levenshteinDistanceWithLengths(translation.getKey(), searchText) *2 - (translation.getKey().toLowerCase().contains(searchText.toLowerCase()) ? 10000 : 0);
+        output += StringUtils.levenshteinDistanceWithLengths(translation.getSourceTranslation(), searchText) *2 - (translation.getSourceTranslation().toLowerCase().contains(searchText.toLowerCase()) ? 10000 : 0);
+        output += StringUtils.levenshteinDistanceWithLengths(translation.getTargetTranslation(), searchText) - (translation.getTargetTranslation().toLowerCase().contains(searchText.toLowerCase()) ? 5000 : 0);
         return output;
     }
     public Map<String, Translation> getSourceTranslations(){

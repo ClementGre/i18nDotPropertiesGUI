@@ -1,13 +1,12 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 plugins {
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.22.3'
+    id 'org.beryx.jlink' version '2.23.6'
+    id 'idea'
+    id 'com.dua3.javafxgradle7plugin' version '0.0.9'
+    id "de.jjohannes.extra-java-module-info" version "0.6"
 }
 repositories{
     mavenCentral()
-    jcenter()
 }
 dependencies{
 
@@ -15,13 +14,13 @@ dependencies{
     implementation (group: 'org.jfxtras', name: 'jmetro', version: '11.6.14'){
         exclude group: 'org.openjfx'
     }
-
+    // ControlsFX
     implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.0'
 
 }
 javafx {
-    version = '15'
-    modules = ['javafx.controls', 'javafx.graphics', 'javafx.swing', 'javafx.fxml']
+    version = '16'
+    modules = ['javafx.controls', 'javafx.swing', 'javafx.fxml']
 }
 
 compileJava.options.encoding = "UTF-8"
@@ -29,28 +28,14 @@ compileTestJava.options.encoding = "UTF-8"
 mainClassName = "i18nDotPropertiesGUI/fr.clementgre.i18nDotPropertiesGUI.Main"
 
 version = "1.0"
-description = ""
+description = "GUI for managing i18n .properties translations"
 
-task packageMsi(type: Exec){
-    workingDir project.projectDir
-    commandLine = ["gradlew.bat", "jpackage", "-PinstallerType=msi"]
+application {
+    mainModule.set('i18nDotPropertiesGUI')
+    mainClass.set('fr.clementgre.i18nDotPropertiesGUI.Main')
 }
-task packageDmg(type: Exec){
-    workingDir project.projectDir
-    commandLine = ["./gradlew", "jpackage", "-PinstallerType=dmg"]
-}
-task packageDeb(type: Exec){
-    workingDir project.projectDir
-    commandLine = ["./gradlew", "jpackage", "-PinstallerType=deb"]
-}
-task packageRpm(type: Exec){
-    workingDir project.projectDir
-    commandLine = ["./gradlew", "jpackage", "-PinstallerType=rpm"]
-}
-sourceCompatibility = 14
-targetCompatibility = 14
 
-run{
+run {
     jvmArgs = [
             '--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls',
             '--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls'
@@ -59,64 +44,62 @@ run{
 
 jlink {
     options = [
-                '--strip-debug',
-                '--compress', '2',
-                '--no-header-files',
-                '--no-man-pages',
-            ] as List<String>
+            '--strip-debug',
+            '--compress', '2',
+            '--no-header-files',
+            '--no-man-pages'
+    ] as List<String>
     launcher {
-        name = 'i18nDotPropertiesGUI'
+        name = 'PDF4Teachers'
+        jvmArgs = [
+                '--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls',
+                '--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls'
+        ]
     }
 
-    if(Os.isFamily(Os.FAMILY_WINDOWS)){
-        //targetPlatform('win', 'C:\\Program Files\\Java\\Libertica-15')
-        targetPlatform('win', 'C:\\Program Files\\AdoptOpenJDK\\jdk-15.0.1.7-hotspot')
-    }else if(Os.isFamily(Os.FAMILY_MAC)){
-        targetPlatform('mac', '/Users/vincent/Library/Java/JavaVirtualMachines/openjdk-15.0.1/Contents/Home')
-    }else if(Os.isFamily(Os.FAMILY_UNIX)){
-        targetPlatform('lin', '/home/clement/bin/AdoptOpenJDK-15/')
-    }
+    def os = org.gradle.internal.os.OperatingSystem.current()
+    if(os.windows) targetPlatform('win', 'C:\\Program Files\\AdoptOpenJDK\\jdk-16.0.0.36-openj9')
+    else if(os.macOsX) targetPlatform('mac', '/Users/vincent/Library/Java/JavaVirtualMachines/jdk-16/Contents/Home')
+    else if(os.linux) targetPlatform('lin', '/home/clement/bin/AdoptOpenJDK-16/')
 
     jpackage {
 
-        installerType = project.findProperty('installerType') // we will pass this from the command line (example: -PinstallerType=msi)
+        if(os.windows) targetPlatform('win', 'C:\\Program Files\\AdoptOpenJDK\\jdk-16.0.0.36-openj9')
+        else if(os.macOsX) targetPlatform('mac', '/Users/vincent/Library/Java/JavaVirtualMachines/jdk-16/Contents/Home')
+        else if(os.linux) targetPlatform('lin', '/home/clement/bin/AdoptOpenJDK-16/')
 
+        installerType = os.windows ? 'msi' : (os.macOsX ? 'dmg' : 'deb')
         installerOptions = [
                 '--description', project.description,
-                //'--copyright', 'Copyrigth 2019 Clément Grennerat',
+                '--copyright', 'Copyrigth 2019 Clément Grennerat',
                 '--app-version', project.version,
                 '--vendor', "Clément Grennerat",
                 '--type', installerType
         ] as List<String>
 
-
-
-        if(installerType == 'msi'){ // WINDOWS
-            imageOptions += ['--icon', 'src/main/resources/logo.ico']
+        if(os.windows){ // WINDOWS
+            imageOptions += ['--icon', 'src/main/resources/icon.ico']
             installerOptions += [
                     '--win-dir-chooser',
                     '--win-menu',
-                    '--win-shortcut',
-                    '--win-menu-group'
+                    '--win-shortcut'
             ]
-        }else if(installerType == 'dmg'){ // MAC
-            imageOptions += ['--icon', 'src/main/resources/logo.icns']
+        }else if(os.macOsX){ // MAC
+            imageOptions += ['--icon', 'src/main/resources/icon.icns']
             installerOptions += [
                     "--mac-package-name", "i18nDotPropertiesGUI",
                     '--icon', 'src/main/resources/logo.icns'
             ]
-        }else if(installerType in ['deb', 'rpm']){ // LINUX
+        }else if(os.linux){ // LINUX
             imageOptions += ['--icon', 'src/main/resources/logo.png']
             installerOptions += [
                     '--linux-menu-group', 'Education;Office',
                     '--linux-shortcut',
-                    '--icon', 'src/main/resources/logo.png'
+                    '--icon', 'src/main/resources/icon.png'
             ]
-            if(installerType == 'deb'){
-                installerOptions += ['--linux-deb-maintainer', 'clement.grennerat@free.fr']
-            }else if(installerType == 'rpm'){
-                installerOptions += ['--linux-rpm-license-type', 'Apache-2.0']
-            }
+            if(installerType == 'deb') installerOptions += ['--linux-deb-maintainer', 'clement.grennerat@free.fr']
+            else if(installerType == 'rpm') installerOptions += ['--linux-rpm-license-type', 'Apache-2.0']
+
         }
     }
 }

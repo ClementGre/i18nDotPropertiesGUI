@@ -63,7 +63,7 @@ public class TranslationsDetails extends ScrollPane {
             mainWindow.translationsPane.selectNext();
         });
         targetInput.addEventFilter(KeyEvent.KEY_PRESSED, (e) -> {
-            if(e.getCode() == KeyCode.SPACE && e.isShortcutDown()){
+            if(e.getCode() == KeyCode.SPACE && e.isControlDown()){
                 e.consume();
                 addArg();
             }else if(e.getCode() == KeyCode.C && e.isShortcutDown() && e.isShiftDown()){

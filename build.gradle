@@ -50,7 +50,7 @@ jlink {
             '--no-man-pages'
     ] as List<String>
     launcher {
-        name = 'PDF4Teachers'
+        name = 'i18nDotPropertiesGUI'
         jvmArgs = [
                 '--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls',
                 '--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls'
@@ -58,15 +58,20 @@ jlink {
     }
 
     def os = org.gradle.internal.os.OperatingSystem.current()
-    if(os.windows) targetPlatform('win', 'C:\\Program Files\\AdoptOpenJDK\\jdk-16.0.0.36-openj9')
-    else if(os.macOsX) targetPlatform('mac', '/Users/vincent/Library/Java/JavaVirtualMachines/jdk-16/Contents/Home')
-    else if(os.linux) targetPlatform('lin', '/home/clement/bin/AdoptOpenJDK-16/')
+    String jdkPath = project.findProperty('jdkPath')
+
+    if(jdkPath != null){ // Use ./gradlew jpackage -PjdkPath=xxx
+        System.out.println("Using JDK passed in property: ".concat(jdkPath));
+        String platform = os.windows ? 'win' : (os.macOsX ? 'mac' : 'lin')
+        targetPlatform(platform, jdkPath);
+
+    }else{
+        if(os.windows) targetPlatform('win', 'C:\\Program Files\\AdoptOpenJDK\\jdk-16.0.1.9-hotspot')
+        else if(os.macOsX) targetPlatform('mac', '/Library/Java/JavaVirtualMachines/adopt-openjdk-16.0.1/Contents/Home')
+        else if(os.linux) targetPlatform('lin', '/home/clement/bin/AdoptOpenJDK-16/')
+    }
 
     jpackage {
-
-        if(os.windows) targetPlatform('win', 'C:\\Program Files\\AdoptOpenJDK\\jdk-16.0.0.36-openj9')
-        else if(os.macOsX) targetPlatform('mac', '/Users/vincent/Library/Java/JavaVirtualMachines/jdk-16/Contents/Home')
-        else if(os.linux) targetPlatform('lin', '/home/clement/bin/AdoptOpenJDK-16/')
 
         installerType = os.windows ? 'msi' : (os.macOsX ? 'dmg' : 'deb')
         installerOptions = [
@@ -87,19 +92,17 @@ jlink {
         }else if(os.macOsX){ // MAC
             imageOptions += ['--icon', 'src/main/resources/icon.icns']
             installerOptions += [
-                    "--mac-package-name", "i18nDotPropertiesGUI",
-                    '--icon', 'src/main/resources/logo.icns'
+                    "--mac-package-name", "i18nDotPropertiesGUI"
             ]
         }else if(os.linux){ // LINUX
-            imageOptions += ['--icon', 'src/main/resources/logo.png']
+            imageOptions += ['--icon', 'src/main/resources/icon.png']
             installerOptions += [
-                    '--linux-menu-group', 'Education;Office',
+                    '--linux-menu-group', 'Office',
                     '--linux-shortcut',
-                    '--icon', 'src/main/resources/icon.png'
+                    '--icon', 'src/main/resources/logo.png'
             ]
             if(installerType == 'deb') installerOptions += ['--linux-deb-maintainer', 'clement.grennerat@free.fr']
             else if(installerType == 'rpm') installerOptions += ['--linux-rpm-license-type', 'Apache-2.0']
-
         }
     }
 }

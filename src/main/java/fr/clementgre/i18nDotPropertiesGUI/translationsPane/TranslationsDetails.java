@@ -3,6 +3,7 @@ package fr.clementgre.i18nDotPropertiesGUI.translationsPane;
 import fr.clementgre.i18nDotPropertiesGUI.FullTranslation;
 import fr.clementgre.i18nDotPropertiesGUI.MainWindowController;
 import fr.clementgre.i18nDotPropertiesGUI.utils.StringUtils;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -139,6 +140,10 @@ public class TranslationsDetails extends ScrollPane {
         saveValues();
         this.translation = translation;
         updateGraphics();
+        Platform.runLater(() -> {
+            targetInput.requestFocus();
+            targetInput.end();
+        });
     }
 
 }

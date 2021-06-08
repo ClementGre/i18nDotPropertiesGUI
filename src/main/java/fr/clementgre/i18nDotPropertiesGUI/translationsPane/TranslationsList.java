@@ -115,6 +115,7 @@ public class TranslationsList extends TableView<FullTranslation> {
             }
             searchText = text;
             getSortOrder().clear();
+            scrollTo(0);
         }
         sort();
     }

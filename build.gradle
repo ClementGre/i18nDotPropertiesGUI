@@ -59,19 +59,22 @@ jlink {
 
     def os = org.gradle.internal.os.OperatingSystem.current()
     String jdkPath = project.findProperty('jdkPath')
+    String platform = os.windows ? 'win' : (os.macOsX ? 'mac' : 'lin')
 
     if(jdkPath != null){ // Use ./gradlew jpackage -PjdkPath=xxx
         System.out.println("Using JDK passed in property: ".concat(jdkPath));
-        String platform = os.windows ? 'win' : (os.macOsX ? 'mac' : 'lin')
-        targetPlatform(platform, jdkPath);
+        javaHome.set(jdkPath);
 
     }else{
-        if(os.windows) targetPlatform('win', 'C:\\Program Files\\AdoptOpenJDK\\jdk-16.0.1.9-hotspot')
-        else if(os.macOsX) targetPlatform('mac', '/Library/Java/JavaVirtualMachines/adopt-openjdk-16.0.1/Contents/Home')
-        else if(os.linux) targetPlatform('lin', '/home/clement/bin/AdoptOpenJDK-16/')
+        if(os.windows) javaHome.set('C:\\Program Files\\AdoptOpenJDK\\jdk-16.0.1.9-hotspot');
+        else if(os.macOsX) javaHome.set('/Library/Java/JavaVirtualMachines/adopt-openjdk-16.0.1/Contents/Home')
+        else if(os.linux) javaHome.set('/etc/jdk-16.0.1/')
     }
 
+    targetPlatform(platform, javaHome.get())
+
     jpackage {
+        targetPlatformName = platform
 
         installerType = os.windows ? 'msi' : (os.macOsX ? 'dmg' : 'deb')
         installerOptions = [
@@ -98,8 +101,7 @@ jlink {
             imageOptions += ['--icon', 'src/main/resources/icon.png']
             installerOptions += [
                     '--linux-menu-group', 'Office',
-                    '--linux-shortcut',
-                    '--icon', 'src/main/resources/logo.png'
+                    '--linux-shortcut'
             ]
             if(installerType == 'deb') installerOptions += ['--linux-deb-maintainer', 'clement.grennerat@free.fr']
             else if(installerType == 'rpm') installerOptions += ['--linux-rpm-license-type', 'Apache-2.0']

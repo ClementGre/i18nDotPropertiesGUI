@@ -14,6 +14,10 @@ All these values (except the key) can be edited directly in the app.
 ![preview](https://raw.githubusercontent.com/ClementGre/i18nDotPropertiesGUI/master/images/preview.png)
 *Used to manage the translations of [PDF4Teachers](https://github.com/ClementGre/PDF4Teachers).*
 
+# Learn how to use the app:
+
+[Read i18nDotPropertiesGUI Wiki](https://github.com/ClementGre/i18nDotPropertiesGUI/wiki)
+
 # Target translation keyboard shortcuts
 
 - Ctrl + Space : Add the next argument into the target translation text field (ex: {0}, {1}...)

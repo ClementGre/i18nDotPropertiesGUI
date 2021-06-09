@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=i18nDotPropertiesGUI
+Comment=GUI for managing i18n .properties translations
+Exec=/opt/i18ndotpropertiesgui/bin/i18nDotPropertiesGUI
+Icon=/opt/i18ndotpropertiesgui/lib/i18nDotPropertiesGUI.png
+Terminal=false
+Type=Application
